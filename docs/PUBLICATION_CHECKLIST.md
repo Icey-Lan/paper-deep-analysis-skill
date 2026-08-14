@@ -1,8 +1,7 @@
 # Publication checklist
 
 - [x] All tests pass in an isolated local Python environment (60 tests on
-      Python 3.14; CI matrices for 3.10/3.12 are configured but not yet run on
-      GitHub).
+      Python 3.14) and in public GitHub Actions on Python 3.10 and 3.12.
 - [x] Skill frontmatter passes the official `skills-ref validate` command.
 - [x] Codex and Claude Code project entries resolve to one canonical Skill and
       both pass `skills-ref validate`.

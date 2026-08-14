@@ -6,6 +6,8 @@ Updated: 2026-08-14
 
 - 60 local automated tests after the summary-readability and layout refactor.
 - 83% measured branch-aware code coverage in the local Python 3.14 environment.
+- Public GitHub Actions passed the test, release-audit, and package-build jobs on
+  Python 3.10 and 3.12, plus the independent Skill specification job.
 - Official `skills-ref validate` against the bundled Skill directory.
 - Live source preparation for the same DataClawEval paper through:
   - an existing local PDF;
@@ -43,7 +45,6 @@ Updated: 2026-08-14
   independent Agent sessions.
 - Claude Code format discovery is validated, but the semantic workflow has not
   yet been forward-tested in an independent Claude Code session.
-- GitHub Actions has not run because no remote has been created or pushed.
 - Automated Product Design screenshot capture was blocked when the in-app
   browser rejected the local file URL. The owner subsequently approved the
   current desktop report; mobile and print visual review remains open.
