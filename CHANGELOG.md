@@ -1,6 +1,12 @@
 # Changelog
 
-## 0.1.0 - Unreleased
+## 0.1.1 - 2026-08-14
+
+- Made the paper-source link explicit in generated reports.
+- Added a repository preview of the Cordis paper report with verified public
+  source metadata; the paper PDF itself remains excluded.
+
+## 0.1.0 - 2026-08-14
 
 - Added a portable `paper-deep-analysis` Agent Skill.
 - Added local PDF, guarded public URL, landing-page, and arXiv resolution.

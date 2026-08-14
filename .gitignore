@@ -20,3 +20,7 @@ runs/
 tmp/
 audit/screenshots/
 .eval-workspace/
+
+# Browser capture sessions are local QA artifacts; curated previews live in docs/images/.
+.playwright-cli/
+output/playwright/

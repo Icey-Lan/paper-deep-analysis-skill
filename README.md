@@ -13,7 +13,7 @@ dataset export, and provenance. No external model API is required.
 
 ## Status
 
-This repository contains the public `0.1.0` release of the Skill. No
+This repository contains the public `0.1.1` release of the Skill. No
 reliability, scientific-analysis accuracy, or benchmark claim is made.
 
 ## Skill compatibility
@@ -89,7 +89,7 @@ Outputs under ignored `dist/`:
 ```text
 dist/
 ├── paper-deep-analysis/          # installable Skill directory
-├── paper-deep-analysis-v0.1.0.zip
+├── paper-deep-analysis-v0.1.1.zip
 ├── release-manifest.json         # per-file hashes and compatibility metadata
 └── SHA256SUMS
 ```
@@ -138,6 +138,17 @@ The [DataClawEval example](examples/data-claw/report.html) demonstrates the
 `data-agent` profile. Its source was resolved from an arXiv ID; the paper PDF
 and extracted full text are not included. The example validates the artifact
 pipeline, not the paper's benchmark results or scientific correctness.
+
+## Generated report preview
+
+This desktop preview was generated from *A Programming Paradigm for
+Spatiotemporal Composability* by Yifan Shi, Wei Zhang, and Tianyi Cui. The
+[public source repository](https://github.com/cordiverse/paper) identifies it as
+an actively revised preprint dated 2026-08-13; its public PDF hash matched the
+authorized local PDF used for the report. The source PDF is not redistributed
+here.
+
+[![Cordis paper deep-analysis report preview](docs/images/cordis-report-preview.png)](docs/images/cordis-report-preview.png)
 
 The report renderer follows a dense editorial reading model: scroll progress,
 CSS current-section navigation, a paper-centered core conclusion separated from

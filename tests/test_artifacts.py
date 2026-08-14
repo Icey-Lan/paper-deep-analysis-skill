@@ -59,6 +59,8 @@ def test_renderer_preserves_dense_visual_contract() -> None:
     assert "animation-timeline: --summary" in rendered
     assert "view-timeline-name: --critique" in rendered
     assert sample_analysis()["executive_summary"]["headline"] in rendered.split("<h1>", 1)[1].split("</h1>", 1)[0]
+    assert "Paper source" in rendered
+    assert 'href="https://example.org/test-paper.pdf"' in rendered
 
 
 def test_executive_summary_leads_with_paper_logic_not_review_verdict() -> None:

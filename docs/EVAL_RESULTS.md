@@ -9,6 +9,8 @@ Updated: 2026-08-14
 - Public GitHub Actions passed the test, release-audit, and package-build jobs on
   Python 3.10 and 3.12, plus the independent Skill specification job.
 - Official `skills-ref validate` against the bundled Skill directory.
+- The public Cordiverse PDF matched the authorized local Cordis report input
+  byte-for-byte, and a 1440×1500 desktop preview was captured and inspected.
 - Live source preparation for the same DataClawEval paper through:
   - an existing local PDF;
   - arXiv ID `2607.28033`; and
@@ -34,8 +36,8 @@ Updated: 2026-08-14
   Skill directory all passed `skills-ref validate`.
 - Deterministic release packaging produced 29 runtime files. Repeated builds
   matched byte-for-byte; the current ZIP SHA-256 is
-  `56092176ba6a5ec2cb21bcc5282e6cb7258270a4713e99afcb5df364a6062f8e`.
-- Release audit passed for 59 candidate repository files at this checkpoint.
+  `38edb60f81732bf20072f19c954a2ae01fc2712a44a7ad55cdb3c99e19bfaf1c`.
+- Release audit passed for 60 candidate repository files at this checkpoint.
 
 ## What these results do not establish
 
@@ -45,9 +47,8 @@ Updated: 2026-08-14
   independent Agent sessions.
 - Claude Code format discovery is validated, but the semantic workflow has not
   yet been forward-tested in an independent Claude Code session.
-- Automated Product Design screenshot capture was blocked when the in-app
-  browser rejected the local file URL. The owner subsequently approved the
-  current desktop report; mobile and print visual review remains open.
+- The curated Cordis image covers one desktop viewport; mobile and print visual
+  review remains open.
 - Evidence anchors pass structural checks; a human still needs to confirm that
   each anchor supports the nearby interpretation.
 

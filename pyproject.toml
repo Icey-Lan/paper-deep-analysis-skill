@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paper-deep-analysis-skill"
-version = "0.1.0"
+version = "0.1.1"
 description = "A portable Agent Skill for evidence-grounded paper analysis and offline HTML reports."
 readme = "README.md"
 requires-python = ">=3.10"

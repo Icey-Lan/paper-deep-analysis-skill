@@ -234,7 +234,7 @@ footer .top-link { display: inline-block; margin-top: .4rem; }
 ZH = {
     "toc": "目录", "summary": "执行摘要", "narrative": "论文如何建立问题与贡献", "method": "方法",
     "evidence": "证据", "claims": "核心主张与支持", "critique": "批判", "profile": "定向视角",
-    "concepts": "概念", "repro": "可复现性", "questions": "开放问题", "paper": "原文",
+    "concepts": "概念", "repro": "可复现性", "questions": "开放问题", "paper": "原文", "paper_source": "查看论文来源",
     "analysis_basis": "阅读依据", "judgment_source": "判断来源", "generation": "生成说明",
     "evidence_overview": "证据概况", "reading_limits": "阅读限制", "key_metrics": "关键指标",
     "why": "为什么重要", "bottom": "分析判断", "focus": "关注问题", "research_context": "研究背景",
@@ -260,7 +260,7 @@ ZH = {
 EN = {
     "toc": "On this page", "summary": "Executive summary", "narrative": "How the paper builds its case", "method": "Method",
     "evidence": "Evidence", "claims": "Core claims and support", "critique": "Critical assessment", "profile": "Directed perspective",
-    "concepts": "Concepts", "repro": "Reproducibility", "questions": "Open questions", "paper": "Paper",
+    "concepts": "Concepts", "repro": "Reproducibility", "questions": "Open questions", "paper": "Paper", "paper_source": "Paper source",
     "analysis_basis": "Reading basis", "judgment_source": "Judgment source", "generation": "Generation disclosure",
     "evidence_overview": "Evidence overview", "reading_limits": "Reading limits", "key_metrics": "Key metrics",
     "why": "Why it matters", "bottom": "Analyst verdict", "focus": "Focus questions", "research_context": "Research context",
@@ -394,7 +394,7 @@ def render_report(analysis: dict[str, Any]) -> str:
     is_zh = context["language"].lower().startswith("zh")
     labels = ZH if is_zh else EN
     lang = "zh-CN" if is_zh else context["language"]
-    source_link = f'<a href="{esc(paper["source_url"])}" rel="noreferrer">{labels["paper"]}</a>' if paper.get("source_url") else ""
+    source_link = f'<a href="{esc(paper["source_url"])}" rel="noreferrer">{labels["paper_source"]}</a>' if paper.get("source_url") else ""
     focus = "".join(f'<li>{esc(question)}</li>' for question in context["focus_questions"])
     warnings = ""
     if boundary["extraction_warnings"]:

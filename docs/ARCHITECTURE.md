@@ -43,7 +43,7 @@ the GitHub repository auditable but are not required at runtime.
 .agents/skills/paper-deep-analysis/       canonical Agent Skills package
 .claude/skills/paper-deep-analysis        symlink to the canonical package
 dist/paper-deep-analysis/                 generated standalone package, ignored
-dist/paper-deep-analysis-v0.1.0.zip       deterministic release archive, ignored
+dist/paper-deep-analysis-v0.1.1.zip       deterministic release archive, ignored
 ```
 
 Codex-specific UI metadata stays in `agents/openai.yaml`; Claude Code ignores
