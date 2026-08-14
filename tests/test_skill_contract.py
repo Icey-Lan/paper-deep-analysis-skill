@@ -20,6 +20,8 @@ def test_skill_frontmatter_and_name() -> None:
     assert "local PDF" in metadata["description"]
     assert "arXiv" in metadata["description"]
     assert len(body.splitlines()) < 500
+    assert ".agents/skills/paper-deep-analysis/scripts" not in body
+    assert "PAPER_SKILL_DIR" in body
 
 
 def test_eval_set_covers_inputs_failures_and_negative_routes() -> None:

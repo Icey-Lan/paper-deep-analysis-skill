@@ -8,6 +8,8 @@ from .common import read_json, write_text
 
 
 def _statements(analysis: dict[str, Any]) -> Iterable[tuple[str, dict[str, Any]]]:
+    for item in analysis["paper_narrative"].values():
+        yield "narrative", item
     for item in analysis["contributions"]:
         yield "contribution", item
     method = analysis["method"]
@@ -17,11 +19,18 @@ def _statements(analysis: dict[str, Any]) -> Iterable[tuple[str, dict[str, Any]]
         yield "method", item
     for item in method["assumptions"]:
         yield "assumption", item
+    synthesis = analysis["evidence_synthesis"]
+    for key in ("strengths", "weaknesses", "reusability"):
+        yield "finding", synthesis[key]
     for item in analysis["claims"]:
         yield "claim", item
     critical = analysis["critical_assessment"]
     for item in critical["strengths"]:
         yield "finding", item
+    for item in critical["claim_evidence_gaps"]:
+        yield "critique", item
+    for item in critical["comparison_to_prior_work"]:
+        yield "critique", item
     for item in critical["limitations"]:
         yield "limitation", item
     for item in critical["threats_to_validity"]:
@@ -30,8 +39,16 @@ def _statements(analysis: dict[str, Any]) -> Iterable[tuple[str, dict[str, Any]]
         yield "limitation", item
     yield "finding", critical["overall_judgment"]
     yield "reproducibility", analysis["reproducibility"]["replication_notes"]
+    yield "profile_insight", analysis["profile_analysis"]["summary"]
     for item in analysis["profile_analysis"]["insights"]:
         yield "profile_insight", item
+    for item in analysis["concepts"]:
+        concept = dict(item)
+        concept["text"] = (
+            f"{item['term']}: {item['definition']} "
+            f"Plain language: {item['plain_language']} Why it matters: {item['why_it_matters']}"
+        )
+        yield "concept", concept
     for item in analysis["open_questions"]:
         yield "open_question", item
 

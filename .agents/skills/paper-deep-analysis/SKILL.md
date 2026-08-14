@@ -1,11 +1,6 @@
 ---
 name: paper-deep-analysis
-description: Deeply analyzes a research paper from a local PDF, public PDF URL, paper link, arXiv URL, or arXiv ID. Use when the user asks to read, critique, explain, compare, or learn from one paper and wants an evidence-grounded human-readable HTML report plus structured Agent-learning JSONL. Supports general, agent-systems, data-agent, and custom analysis profiles. Refuses paywall bypass, private-network fetching, and unsupported image-only PDFs.
-license: MIT
-compatibility: Requires Python 3.10+, pypdf, requests, and jsonschema. Network access is needed for URL and arXiv inputs; local PDFs work offline.
-metadata:
-  version: "0.1.0"
-  artifact-contract: "analysis-json-first"
+description: Deeply analyzes a research paper from a local PDF, public PDF URL, paper link, arXiv URL, or arXiv ID. Use when the user asks to read, critique, explain, compare, or learn from one paper and wants an evidence-grounded human-readable HTML report plus structured Agent-learning JSONL. Selects a paper-specific research perspective such as Agent evaluation, Harness, Memory, continual learning, or Data Agent. Refuses paywall bypass, private-network fetching, and unsupported image-only PDFs.
 ---
 
 # Paper deep analysis
@@ -13,6 +8,15 @@ metadata:
 Produce an evidence-grounded analysis, not an abstract rewrite. The host Agent
 does the semantic reading; bundled scripts prepare and validate untrusted input,
 render HTML, and export machine-readable learning records.
+
+Requires Python 3.10+, pypdf, requests, and jsonschema. URL and arXiv inputs
+need network access; local PDFs can be processed offline.
+
+Resolve `PAPER_SKILL_DIR` to the absolute directory containing this `SKILL.md`
+before running bundled scripts. Do not assume the Skill is installed under
+`.agents/skills/`; Claude Code, Codex personal installs, and standalone ZIP
+installs may use different roots. In the commands below, substitute the real
+path for `<paper-skill-directory>`.
 
 ## Non-negotiable boundaries
 
@@ -43,7 +47,10 @@ Accept exactly one primary input:
 
 Optional user context:
 
-- `profile`: `general` (default), `agent-systems`, `data-agent`, or `custom`;
+- `profile`: choose the paper's most useful lens from `general`,
+  `agent-systems`, `agent-evaluation`, `harness`, `memory`,
+  `continual-learning`, `multi-agent`, `tool-use`, `reasoning-planning`,
+  `data-agent`, `embodied-agent`, or `custom`;
 - `language`: report language, default to the user's language;
 - `focus_questions`: questions the report must answer;
 - `reader_context`: role, goals, and technical depth;
@@ -59,7 +66,8 @@ clarification unless the choice would materially change a high-stakes analysis.
 Run:
 
 ```bash
-python .agents/skills/paper-deep-analysis/scripts/preflight.py \
+PAPER_SKILL_DIR="<paper-skill-directory>"
+python "${PAPER_SKILL_DIR}/scripts/preflight.py" \
   "<INPUT>" --output-dir ".work/<RUN_ID>" \
   --write-result ".work/<RUN_ID>-preflight.json"
 ```
@@ -73,7 +81,8 @@ automatically block the run. See
 Run:
 
 ```bash
-python .agents/skills/paper-deep-analysis/scripts/prepare_source.py \
+PAPER_SKILL_DIR="<paper-skill-directory>"
+python "${PAPER_SKILL_DIR}/scripts/prepare_source.py" \
   "<INPUT>" --output-dir ".work/<RUN_ID>"
 ```
 
@@ -106,6 +115,12 @@ Read the extracted `pages.jsonl` in passes:
 4. limitations, threats, ethics, reproducibility, and missing evidence;
 5. implications for the selected profile and focus questions.
 
+Reconstruct the Introduction's argument before drafting isolated findings:
+research context, prior-work gap, why the gap matters, proposed solution, and
+main findings. This narrative is the reader's entry point and should explain the
+paper in ordinary technical language rather than assuming familiarity with its
+terminology.
+
 Inspect relevant figures, tables, or equations in the PDF when they carry key
 evidence. Text extraction alone is insufficient for visual evidence.
 
@@ -121,6 +136,62 @@ number or an explicit section. Label every statement:
 Separate evidence strength from prose confidence. Use `not_reported` rather than
 guessing. Keep quotations short; prefer paraphrase plus an anchor.
 
+Treat the human report as a dense research reading artifact, not a generic card
+page. Write `executive_summary.headline` as a concise, plain-language statement
+of the paper's central contribution or finding, not as a review score. Assume
+the first-screen reader may be an AI explorer without the paper's specialist
+background. Write `executive_summary.core_conclusion` as the report's most
+important paragraph and reading hook:
+
+1. state the gap or task the paper addresses;
+2. name the paper's method, system, dataset, or evaluation object;
+3. state the strongest paper-supported finding and what it changes;
+4. make the paragraph understandable without reading the rest of the report.
+
+For Chinese reports, use two short sentences and normally target 90-160 Chinese
+characters; never exceed 220. Sentence one should state the problem in familiar
+language and create a reason to continue. Sentence two should say what the paper
+did and the clearest supported result. Preserve scientific scope, but do not put
+formulas, complexity notation, LaTeX, unexplained abbreviations, or paper-native
+jargon in this field. Spell out an essential term in plain Chinese on first use,
+or move the technical detail to Method, Evidence, or Concepts. Do not compress
+every setup detail, model size, benchmark name, or caveat into the hook.
+
+Do not lead `core_conclusion` with "this is a valuable paper, but...",
+limitations, production readiness, personal recommendation, or an analyst
+verdict. Put those judgments in `executive_summary.analyst_verdict`; put support
+boundaries in `evidence_summary`. Use `why_it_matters` to connect the paper to the
+reader's decision or research context. Before accepting the summary, check that
+a curious non-specialist can answer three questions after one read: what problem
+matters, what the paper did, and what result is worth remembering.
+
+Populate
+`key_metrics` with three to six decision-relevant quantities when the paper
+actually reports them; each metric needs context and an evidence anchor. Leave
+the array empty when the paper has no defensible quantitative summary instead
+of manufacturing dashboard numbers. The renderer derives the method flow and
+other explanatory structures from validated fields, so do not author HTML,
+SVG, chart code, or decorative scores.
+
+Do not turn qualitative evidence judgments into bar lengths, meters, or a
+pseudo-quantitative distribution. Instead, write one explicit
+`evidence_summary` sentence explaining what the evidence supports and what it
+does not. Fill `evidence_synthesis` with the paper's actual experiment scope,
+measures, findings, strengths, weaknesses, and reusable evaluation pattern.
+
+Build criticism across multiple defensible dimensions: method/evidence
+strengths, claim-evidence gaps, relationship to prior work or SOTA, scope and
+method limitations, validity/generalization risks, and missing evidence. Each
+point needs a source anchor. The HTML groups points into coherent passages and
+shows their source locations after the passage, so citations do not fragment
+the reading flow.
+
+Select the directed perspective from the paper's real contribution rather than
+defaulting every paper to Data Agent. Summarize applicability and integration
+difficulty before detailed insights. Capture two to six concepts with a formal
+definition, plain-language explanation, why the concept matters, and evidence
+anchors.
+
 ### 5. Validate, render, and export
 
 Copy the redacted public manifest produced by source preparation into the public
@@ -132,20 +203,21 @@ model, time, analysis basis, and input kind. Keep `validation_status` as
 Run in order:
 
 ```bash
-python .agents/skills/paper-deep-analysis/scripts/validate_artifacts.py \
+PAPER_SKILL_DIR="<paper-skill-directory>"
+python "${PAPER_SKILL_DIR}/scripts/validate_artifacts.py" \
   --analysis outputs/<ID>/analysis.json \
   --manifest .work/<RUN_ID>/source-manifest.json \
   --run outputs/<ID>/run.json
 
-python .agents/skills/paper-deep-analysis/scripts/render_report.py \
+python "${PAPER_SKILL_DIR}/scripts/render_report.py" \
   --analysis outputs/<ID>/analysis.json \
   --output outputs/<ID>/report.html
 
-python .agents/skills/paper-deep-analysis/scripts/export_learning_dataset.py \
+python "${PAPER_SKILL_DIR}/scripts/export_learning_dataset.py" \
   --analysis outputs/<ID>/analysis.json \
   --output outputs/<ID>/agent-learning.jsonl
 
-python .agents/skills/paper-deep-analysis/scripts/validate_artifacts.py \
+python "${PAPER_SKILL_DIR}/scripts/validate_artifacts.py" \
   --analysis outputs/<ID>/analysis.json \
   --manifest .work/<RUN_ID>/source-manifest.json \
   --run outputs/<ID>/run.json \
@@ -164,6 +236,18 @@ leave the run pending and record the failure; do not publish partial artifacts.
 Open the final HTML and inspect desktop, mobile, and print layouts. Confirm:
 
 - the first screen conveys the paper, contribution, and analysis boundary;
+- the first screen is information-dense: conclusion, evidence overview, and any
+  anchored key metrics are visible without decorative whitespace;
+- a Chinese report uses Chinese interface labels and explains reading basis,
+  judgment source, generation disclosure, and reading limitations concretely;
+- the top reading-progress indicator responds to scrolling in supporting
+  browsers and is hidden in print;
+- key metrics show only the value and meaning in the visual strip; their source
+  anchors remain in canonical JSON rather than interrupting the first glance;
+- no evidence map, claim-strength meter, or other unexplained qualitative score
+  appears; the method flow and experiment table remain readable;
+- citations follow a complete paragraph, list, or table rather than appearing
+  after every sentence;
 - navigation and evidence links work;
 - long titles, author lists, URLs, code, and equations do not overflow;
 - limitations are as visible as strengths;

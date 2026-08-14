@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paper Deep Analysis"
+  short_description: "Evidence-grounded paper reports and Agent datasets"
+  default_prompt: "Use $paper-deep-analysis to deeply analyze this paper and produce a traceable HTML report plus an Agent-learning dataset."

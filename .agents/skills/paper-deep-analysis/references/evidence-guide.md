@@ -27,6 +27,11 @@ record that in `note` rather than manufacturing precision.
 - `not_reported`: the paper provides no supporting evidence found during review.
 
 This describes support in the paper, not whether the claim is universally true.
+Keep these labels in canonical data for validation and downstream learning. Do
+not convert them into visual bar lengths, percentages, radar charts, or an
+overall paper score unless the user supplies a separate, documented scoring
+rubric. In the human report, explain the concrete evidence and its limits in
+prose.
 
 ## Attribution
 

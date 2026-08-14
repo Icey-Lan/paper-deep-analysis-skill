@@ -21,10 +21,11 @@ Agent-learning export. Existing Tracker changes were protected in local commit
 | Contract and safety boundary | Complete | Skill metadata, schemas, safety/copyright docs, trigger eval set |
 | Source preparation | Complete for v0.1 | Live local PDF, arXiv ID, and direct public URL resolved to the same hash; guarded/mocked failures |
 | Canonical analysis | Complete, under review | Generic schema plus general/agent-systems/data-agent/custom profiles |
-| HTML and JSONL artifacts | Complete, under visual review | Offline renderer, escaping, semantic checks, 56-record live example |
-| Automated quality suite | Complete for v0.1 code paths | 43 tests passed; 82% measured code coverage; no accuracy claim |
-| Visual and print QA | Blocked | In-app browser rejected local file URL; static HTML checks pass, screenshot review remains required |
-| Public release audit | Partially complete | License, candidate-file, secret, path, and local-history checks pass; visual review and owner confirmation remain |
+| HTML and JSONL artifacts | Complete, under visual review | Editorial layout, reading progress, current-section TOC, paper-centered executive summary, Introduction narrative, experiment evidence, six-dimensional critique, dynamic profile, concepts, 72-record live example |
+| Automated quality suite | Complete for v0.1 code paths | 60 tests passed; 83% measured code coverage; no accuracy claim |
+| Visual and print QA | Partially complete | Owner approved the current desktop report; automated capture remains blocked and mobile/print review is still required |
+| Cross-client package | Complete for format compatibility | One canonical Skill, Claude Code symlink entry, deterministic 29-file ZIP, three `skills-ref` validations |
+| Public release audit | Complete locally, awaiting owner release action | 60 candidate files pass license, secret, path, symlink, archive, and checksum checks; nothing pushed |
 
 ## Current limitations
 
@@ -35,3 +36,6 @@ Agent-learning export. Existing Tracker changes were protected in local commit
 - Scientific fidelity still needs human review even after schema validation.
 - Visual screenshot evidence is pending because the selected Product Design
   browser could not open the local report under its security policy.
+
+See [DESIGN_DENSITY_REVIEW.md](DESIGN_DENSITY_REVIEW.md) for the design
+regression analysis and the new deterministic visual contract.

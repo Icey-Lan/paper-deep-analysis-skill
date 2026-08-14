@@ -23,6 +23,7 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: pytest --cov --cov-report=term
       - run: python scripts/release_audit.py
+      - run: python scripts/build_release.py --output-dir "${RUNNER_TEMP}/paper-deep-analysis-release"
 
   skill-spec:
     runs-on: ubuntu-latest
@@ -33,3 +34,4 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install 'git+https://github.com/agentskills/agentskills.git@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref'
       - run: skills-ref validate .agents/skills/paper-deep-analysis
+      - run: skills-ref validate .claude/skills/paper-deep-analysis

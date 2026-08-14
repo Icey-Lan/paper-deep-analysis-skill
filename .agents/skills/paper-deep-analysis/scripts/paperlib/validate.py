@@ -17,6 +17,14 @@ LEARNING_SCHEMA = SKILL_ROOT / "references" / "learning-record.schema.json"
 RUN_SCHEMA = SKILL_ROOT / "references" / "run.schema.json"
 MANIFEST_SCHEMA = SKILL_ROOT / "references" / "source-manifest.schema.json"
 PLACEHOLDER_RE = re.compile(r"\b(?:replace[- ]with|not yet analyzed|todo|tbd)\b", re.IGNORECASE)
+REVIEW_LEAD_RE = re.compile(
+    r"^(?:这是一篇|这篇(?:论文|工作)(?:很|非常)?(?:有价值|优秀|重要|薄弱)|"
+    r"this (?:is|paper is) (?:a )?(?:valuable|strong|weak|important))",
+    re.IGNORECASE,
+)
+SUMMARY_FORMULA_RE = re.compile(
+    r"(?:\$[^$]+\$|\\\(|\\\[|\b[OΘΩ]\s*\([^)]{1,48}\)|[α-ωΑ-Ω])"
+)
 
 
 class ReportParser(HTMLParser):
@@ -29,11 +37,16 @@ class ReportParser(HTMLParser):
         self.href_fragments: list[str] = []
         self.has_skip_link = False
         self.has_print_css = False
+        self.has_reading_progress = False
+        self.has_current_section_css = False
+        self.has_reduced_motion_css = False
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         tag = tag.lower()
         self.counts[tag] = self.counts.get(tag, 0) + 1
         values = {key.lower(): value or "" for key, value in attrs}
+        if "reading-progress" in values.get("class", "").split():
+            self.has_reading_progress = True
         if tag in {"script", "iframe", "object", "embed", "svg"}:
             self.forbidden.append(tag)
         if values.get("id"):
@@ -50,6 +63,10 @@ class ReportParser(HTMLParser):
     def handle_data(self, data: str) -> None:
         if "@media print" in data:
             self.has_print_css = True
+        if "animation-timeline: --summary" in data and "view-timeline-name: --summary" in data:
+            self.has_current_section_css = True
+        if "@media (prefers-reduced-motion: reduce)" in data:
+            self.has_reduced_motion_css = True
 
 
 def _format_error(error: Any) -> str:
@@ -58,6 +75,10 @@ def _format_error(error: Any) -> str:
 
 
 def _iter_statements(analysis: dict[str, Any]) -> Iterable[tuple[str, dict[str, Any], bool]]:
+    narrative = analysis.get("paper_narrative", {})
+    for key in ("research_context", "prior_work_gap", "problem_importance", "proposed_solution", "main_findings"):
+        if isinstance(narrative.get(key), dict):
+            yield f"paper_narrative.{key}", narrative[key], True
     for index, item in enumerate(analysis.get("contributions", [])):
         yield f"contributions[{index}]", item, True
     method = analysis.get("method", {})
@@ -67,10 +88,14 @@ def _iter_statements(analysis: dict[str, Any]) -> Iterable[tuple[str, dict[str, 
     for key in ("workflow", "assumptions"):
         for index, item in enumerate(method.get(key, [])):
             yield f"method.{key}[{index}]", item, True
+    synthesis = analysis.get("evidence_synthesis", {})
+    for key in ("strengths", "weaknesses", "reusability"):
+        if isinstance(synthesis.get(key), dict):
+            yield f"evidence_synthesis.{key}", synthesis[key], True
     for index, item in enumerate(analysis.get("claims", [])):
         yield f"claims[{index}]", item, True
     critical = analysis.get("critical_assessment", {})
-    for key in ("strengths", "limitations", "threats_to_validity", "missing_evidence"):
+    for key in ("strengths", "claim_evidence_gaps", "comparison_to_prior_work", "limitations", "threats_to_validity", "missing_evidence"):
         for index, item in enumerate(critical.get(key, [])):
             yield f"critical_assessment.{key}[{index}]", item, True
     if isinstance(critical.get("overall_judgment"), dict):
@@ -79,8 +104,12 @@ def _iter_statements(analysis: dict[str, Any]) -> Iterable[tuple[str, dict[str, 
     if isinstance(reproduction.get("replication_notes"), dict):
         yield "reproducibility.replication_notes", reproduction["replication_notes"], True
     profile = analysis.get("profile_analysis", {})
+    if isinstance(profile.get("summary"), dict):
+        yield "profile_analysis.summary", profile["summary"], True
     for index, item in enumerate(profile.get("insights", [])):
         yield f"profile_analysis.insights[{index}]", item, True
+    for index, item in enumerate(analysis.get("concepts", [])):
+        yield f"concepts[{index}]", item, True
     for index, item in enumerate(analysis.get("open_questions", [])):
         yield f"open_questions[{index}]", item, False
 
@@ -91,6 +120,18 @@ def validate_analysis(analysis: dict[str, Any], manifest: dict[str, Any] | None 
     errors = [_format_error(error) for error in sorted(validator.iter_errors(analysis), key=lambda item: list(item.absolute_path))]
     warnings: list[str] = []
     checks = ["analysis-schema"] if not errors else []
+    summary = analysis.get("executive_summary", {})
+    core_conclusion = str(summary.get("core_conclusion", "")).strip()
+    analyst_verdict = str(summary.get("analyst_verdict", "")).strip()
+    language = str(analysis.get("analysis_context", {}).get("language", "")).lower()
+    if REVIEW_LEAD_RE.search(core_conclusion):
+        errors.append("executive_summary.core_conclusion begins with an analyst review instead of the paper's problem-method-finding logic")
+    if core_conclusion and analyst_verdict and core_conclusion == analyst_verdict:
+        errors.append("executive_summary.core_conclusion must remain distinct from analyst_verdict")
+    if language.startswith("zh") and len(core_conclusion) > 220:
+        errors.append("executive_summary.core_conclusion exceeds the 220-character Chinese readability limit")
+    if SUMMARY_FORMULA_RE.search(core_conclusion):
+        errors.append("executive_summary.core_conclusion contains formula notation; explain the result in plain language and move formulas to the method or evidence sections")
     if errors:
         return errors, warnings, checks
 
@@ -103,6 +144,25 @@ def validate_analysis(analysis: dict[str, Any], manifest: dict[str, Any] | None 
         errors.append("analysis_context.profile does not match profile_analysis.profile")
     seen: set[str] = set()
     page_count = manifest.get("page_count") if manifest else None
+    for index, item in enumerate(analysis.get("key_metrics", [])):
+        location = f"key_metrics[{index}]"
+        item_id = item.get("id")
+        if item_id in seen:
+            errors.append(f"{location}: duplicate item id {item_id}")
+        seen.add(item_id)
+        anchors = item.get("anchors", [])
+        if not anchors:
+            errors.append(f"{location}: key metric has no evidence anchor")
+        for anchor in anchors:
+            page = anchor.get("page")
+            if page_count and page and page > page_count:
+                errors.append(f"{location}: evidence page {page} exceeds manifest page count {page_count}")
+    for index, item in enumerate(analysis.get("evidence_synthesis", {}).get("experiments", [])):
+        location = f"evidence_synthesis.experiments[{index}]"
+        for anchor in item.get("anchors", []):
+            page = anchor.get("page")
+            if page_count and page and page > page_count:
+                errors.append(f"{location}: evidence page {page} exceeds manifest page count {page_count}")
     for location, item, anchor_required in _iter_statements(analysis):
         item_id = item.get("id")
         if item_id in seen:
@@ -204,6 +264,20 @@ def validate_html(path: Path) -> tuple[list[str], list[str], list[str]]:
         errors.append("HTML is missing a skip link to main content")
     if not parser.has_print_css:
         errors.append("HTML is missing print styles")
+    if not parser.has_reading_progress:
+        errors.append("HTML is missing the reading progress indicator")
+    if not parser.has_current_section_css:
+        errors.append("HTML is missing CSS current-section table-of-contents feedback")
+    if not parser.has_reduced_motion_css:
+        errors.append("HTML is missing reduced-motion styles")
+    if parser.counts.get("figure", 0) < 1:
+        errors.append("HTML must contain at least one captioned explanatory figure")
+    if parser.counts.get("figcaption", 0) != parser.counts.get("figure", 0):
+        errors.append("Every HTML figure must have a figcaption")
+    if parser.counts.get("meter", 0):
+        errors.append("HTML contains an unexplained meter-style evidence score")
+    if parser.counts.get("table", 0) < 1:
+        errors.append("HTML is missing the compact experiment evidence table")
     missing_fragments = sorted({fragment for fragment in parser.href_fragments if fragment and fragment not in parser.ids})
     if missing_fragments:
         errors.append(f"HTML has unresolved fragment links: {missing_fragments}")
@@ -211,6 +285,8 @@ def validate_html(path: Path) -> tuple[list[str], list[str], list[str]]:
         errors.append("HTML contains a local absolute path")
     if PLACEHOLDER_RE.search(text):
         errors.append("HTML contains an unresolved template placeholder")
+    if '<html lang="zh' in text and any(token in text for token in ("Reading boundary", "Analysis basis:", "Generation disclosure", "Source locations:")):
+        errors.append("Chinese HTML contains untranslated interface copy")
     return errors, warnings, ["html-structure", "html-offline", "html-public-safety"] if not errors else []
 
 

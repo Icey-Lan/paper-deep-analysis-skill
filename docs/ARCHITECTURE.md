@@ -36,3 +36,18 @@ hand is unsupported because it breaks traceability.
 The Skill is self-contained beneath `.agents/skills/paper-deep-analysis/` so it
 can be copied into another compatible repository. Root-level tests and docs make
 the GitHub repository auditable but are not required at runtime.
+
+## Cross-client layout
+
+```text
+.agents/skills/paper-deep-analysis/       canonical Agent Skills package
+.claude/skills/paper-deep-analysis        symlink to the canonical package
+dist/paper-deep-analysis/                 generated standalone package, ignored
+dist/paper-deep-analysis-v0.1.0.zip       deterministic release archive, ignored
+```
+
+Codex-specific UI metadata stays in `agents/openai.yaml`; Claude Code ignores
+that optional directory and reads the shared `SKILL.md` and supporting files.
+The standalone builder copies runtime files from the canonical package, adds the
+MIT license, rejects unexpected runtime file types, creates stable ZIP metadata,
+and verifies every archived file hash before writing the release manifest.

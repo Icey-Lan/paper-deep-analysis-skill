@@ -40,10 +40,136 @@ def test_evidence_page_must_exist() -> None:
 
 def test_renderer_escapes_model_text() -> None:
     analysis = sample_analysis()
-    analysis["executive_summary"]["one_sentence"] = '<script>alert("x")</script>'
+    analysis["executive_summary"]["core_conclusion"] = '<script>alert("x")</script>' * 4
     rendered = render_report(analysis)
     assert '<script>alert("x")</script>' not in rendered
     assert "&lt;script&gt;" in rendered
+
+
+def test_renderer_preserves_dense_visual_contract() -> None:
+    rendered = render_report(sample_analysis())
+    assert rendered.count("<figure") >= 2
+    assert "reading-progress" in rendered
+    assert "<meter" not in rendered
+    assert 'class="metrics-strip metrics-columns-' in rendered
+    assert 'class="process-flow"' in rendered
+    assert 'class="evidence-table"' in rendered
+    assert 'id="narrative"' in rendered
+    assert 'id="concepts"' in rendered
+    assert "animation-timeline: --summary" in rendered
+    assert "view-timeline-name: --critique" in rendered
+    assert sample_analysis()["executive_summary"]["headline"] in rendered.split("<h1>", 1)[1].split("</h1>", 1)[0]
+
+
+def test_executive_summary_leads_with_paper_logic_not_review_verdict() -> None:
+    analysis = sample_analysis()
+    rendered = render_report(analysis)
+    summary_html = rendered.split('id="summary"', 1)[1].split("</section>", 1)[0]
+    assert analysis["executive_summary"]["core_conclusion"] in summary_html
+    assert summary_html.index(analysis["executive_summary"]["core_conclusion"]) < summary_html.index(analysis["executive_summary"]["analyst_verdict"])
+
+
+def test_review_style_core_conclusion_is_rejected() -> None:
+    analysis = sample_analysis()
+    analysis["executive_summary"]["core_conclusion"] = "This is a valuable paper, but the evidence remains scoped and the broader deployment claim still needs independent verification."
+    errors, _, _ = validate_analysis(analysis, sample_manifest())
+    assert any("begins with an analyst review" in error for error in errors)
+
+
+def test_chinese_core_conclusion_readability_limits_are_enforced() -> None:
+    analysis = sample_analysis()
+    analysis["analysis_context"]["language"] = "zh-CN"
+    analysis["executive_summary"]["core_conclusion"] = "这篇论文研究一个重要问题，并提出清晰的方法来完成验证。" * 10
+    errors, _, _ = validate_analysis(analysis, sample_manifest())
+    assert any("220-character Chinese readability limit" in error for error in errors)
+
+
+def test_formula_notation_is_rejected_in_core_conclusion() -> None:
+    analysis = sample_analysis()
+    analysis["executive_summary"]["core_conclusion"] = "The paper reduces the cumulative cost from O(n²) to O(n) while retaining the stated evaluation result."
+    errors, _, _ = validate_analysis(analysis, sample_manifest())
+    assert any("contains formula notation" in error for error in errors)
+
+
+def test_key_metric_strip_hides_citations_and_chinese_ui_is_localized() -> None:
+    analysis = sample_analysis()
+    analysis["analysis_context"]["language"] = "zh-CN"
+    rendered = render_report(analysis)
+    metric_strip = rendered.split('class="metrics-strip ', 1)[1].split("</figure>", 1)[0]
+    assert 'class="source-line"' not in metric_strip
+    assert "阅读依据" in rendered
+    assert "判断来源" in rendered
+    assert "生成说明" in rendered
+    assert "Reading boundary" not in rendered
+
+
+def test_dense_metric_strip_caps_desktop_grid_at_three_columns() -> None:
+    analysis = sample_analysis()
+    analysis["key_metrics"] = [dict(analysis["key_metrics"][0], id=f"metric-{index}") for index in range(6)]
+    rendered = render_report(analysis)
+    assert 'class="metrics-strip metrics-columns-3"' in rendered
+    assert "--metric-columns:3" in rendered
+    assert "repeat(var(--metric-count)" not in rendered
+
+
+def test_narrative_label_and_copy_share_top_alignment() -> None:
+    rendered = render_report(sample_analysis())
+    assert ".narrative-block { display: grid; grid-template-columns: 8.5rem minmax(0,1fr); align-items: start;" in rendered
+    assert ".narrative-block h3 { margin: 0;" in rendered
+
+
+def test_dynamic_memory_profile_is_schema_valid() -> None:
+    analysis = sample_analysis()
+    analysis["analysis_context"]["profile"] = "memory"
+    analysis["profile_analysis"]["profile"] = "memory"
+    errors, _, _ = validate_analysis(analysis, sample_manifest())
+    assert errors == []
+
+
+def test_run_schema_accepts_every_analysis_profile() -> None:
+    profiles = [
+        "general", "agent-systems", "agent-evaluation", "harness", "memory",
+        "continual-learning", "multi-agent", "tool-use", "reasoning-planning",
+        "data-agent", "embodied-agent", "custom",
+    ]
+    for profile in profiles:
+        analysis = sample_analysis()
+        analysis["analysis_context"]["profile"] = profile
+        analysis["profile_analysis"]["profile"] = profile
+        run = sample_run()
+        run["profile"] = profile
+        errors, _, _ = validate_run(run, analysis, sample_manifest(), final_artifacts=False)
+        assert errors == [], f"{profile}: {errors}"
+
+
+def test_unexplained_meter_is_rejected(tmp_path: Path) -> None:
+    html_path = tmp_path / "report.html"
+    rendered = render_report(sample_analysis()).replace("</main>", '<meter min="0" max="3" value="2">2</meter></main>')
+    html_path.write_text(rendered, encoding="utf-8")
+    errors, _, _ = validate_html(html_path)
+    assert any("unexplained meter" in error for error in errors)
+
+
+def test_missing_current_section_feedback_is_rejected(tmp_path: Path) -> None:
+    html_path = tmp_path / "report.html"
+    rendered = render_report(sample_analysis()).replace("animation-timeline: --summary", "animation-timeline: none")
+    html_path.write_text(rendered, encoding="utf-8")
+    errors, _, _ = validate_html(html_path)
+    assert any("current-section" in error for error in errors)
+
+
+def test_citations_are_grouped_after_reading_units() -> None:
+    rendered = render_report(sample_analysis())
+    statement_count = len(list(rendered.split('class="source-line"'))) - 1
+    assert statement_count < 20
+    assert sample_analysis()["executive_summary"]["evidence_summary"] in rendered
+
+
+def test_key_metric_requires_valid_anchor() -> None:
+    analysis = sample_analysis()
+    analysis["key_metrics"][0]["anchors"] = []
+    errors, _, _ = validate_analysis(analysis, sample_manifest())
+    assert any("key_metrics" in error and "non-empty" in error for error in errors)
 
 
 def test_html_is_offline_and_semantic(tmp_path: Path) -> None:
@@ -150,6 +276,6 @@ def test_cli_finalizes_run_only_after_artifacts_pass(tmp_path: Path) -> None:
 
 def test_unresolved_placeholder_fails() -> None:
     analysis = sample_analysis()
-    analysis["executive_summary"]["bottom_line"] = "TODO"
+    analysis["executive_summary"]["analyst_verdict"] = "TODO: replace with a calibrated analyst verdict."
     errors, _, _ = validate_analysis(analysis, sample_manifest())
     assert any("placeholder" in error for error in errors)

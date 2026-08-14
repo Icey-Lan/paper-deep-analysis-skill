@@ -9,6 +9,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CANONICAL_SKILL = ROOT / ".agents" / "skills" / "paper-deep-analysis"
+CLAUDE_SKILL = ROOT / ".claude" / "skills" / "paper-deep-analysis"
 MAX_PUBLIC_FILE_BYTES = 2 * 1024 * 1024
 BLOCKED_NAMES = {"source.pdf", "pages.jsonl", ".env", ".env.local"}
 BLOCKED_SUFFIXES = {".pdf", ".p12", ".pfx", ".key", ".pem", ".zip"}
@@ -57,6 +59,10 @@ def check_markdown_links(path: Path, text: str) -> list[str]:
 def audit() -> dict[str, object]:
     errors: list[str] = []
     warnings: list[str] = []
+    if not CLAUDE_SKILL.is_symlink():
+        errors.append(".claude/skills/paper-deep-analysis must be a symlink to the canonical Skill")
+    elif CLAUDE_SKILL.resolve() != CANONICAL_SKILL.resolve():
+        errors.append("Claude Code Skill entry does not resolve to the canonical .agents Skill")
     files = candidate_files()
     for path in files:
         relative = path.relative_to(ROOT)

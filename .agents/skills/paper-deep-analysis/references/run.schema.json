@@ -17,7 +17,13 @@
     "model": {"type": "string", "minLength": 1, "maxLength": 200},
     "external_model_api_used": {"type": "boolean"},
     "analysis_basis": {"enum": ["full_text", "partial_text", "abstract_only"]},
-    "profile": {"enum": ["general", "agent-systems", "data-agent", "custom"]},
+    "profile": {
+      "enum": [
+        "general", "agent-systems", "agent-evaluation", "harness", "memory",
+        "continual-learning", "multi-agent", "tool-use", "reasoning-planning",
+        "data-agent", "embodied-agent", "custom"
+      ]
+    },
     "input_kind": {"enum": ["local_pdf", "public_url", "landing_page", "arxiv"]},
     "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "validation_status": {"enum": ["pending", "pass", "fail"]},

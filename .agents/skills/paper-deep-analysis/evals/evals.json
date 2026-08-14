@@ -11,9 +11,9 @@
     {
       "id": 2,
       "prompt": "深读 arXiv 2607.28033，重点分析它对 data agent 和数据工程的价值。",
-      "expected_output": "Resolve the arXiv ID, read the full text with evidence anchors, select the data-agent profile, and render validated public-safe artifacts.",
+      "expected_output": "Resolve the arXiv ID, read the full text with evidence anchors, select the data-agent profile, reconstruct the Introduction narrative, write a concise formula-free core conclusion that a non-specialist AI explorer can understand before the separate analyst verdict, explain experiments without pseudo-scores, add multi-dimensional criticism and concepts, and render validated public-safe artifacts.",
       "expected_route": "paper-deep-analysis",
-      "expectations": ["resolves arXiv ID", "selects data-agent profile", "uses evidence anchors"]
+      "expectations": ["resolves arXiv ID", "selects data-agent profile", "reconstructs Introduction logic", "writes a concise formula-free summary for a non-specialist reader", "separates the paper core from the analyst verdict", "uses evidence anchors", "does not render qualitative evidence meters"]
     },
     {
       "id": 3,
@@ -25,9 +25,9 @@
     {
       "id": 4,
       "prompt": "分析这篇论文，重点回答实验是否足以支持持续学习的结论，以及有哪些灾难性遗忘风险。论文链接：https://example.org/paper",
-      "expected_output": "Retain the focus questions, discover only an explicit public PDF, and separate reported continual-learning evidence from analyst inference and missing evidence.",
+      "expected_output": "Retain the focus questions, discover only an explicit public PDF, select the continual-learning perspective when supported, and separate reported evidence from analyst inference, catastrophic-forgetting risks, and missing evidence.",
       "expected_route": "paper-deep-analysis",
-      "expectations": ["retains focus questions", "separates author claims from inference", "checks landing-page PDF conservatively"]
+      "expectations": ["retains focus questions", "selects a paper-appropriate directed perspective", "separates author claims from inference", "checks landing-page PDF conservatively"]
     },
     {
       "id": 5,

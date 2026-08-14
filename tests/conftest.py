@@ -55,9 +55,27 @@ def sample_analysis(sha256: str = "a" * 64) -> dict[str, Any]:
             "extraction_warnings": [],
         },
         "executive_summary": {
-            "one_sentence": "The paper tests a bounded research method.",
+            "headline": "A staged evaluation method exposes failures hidden by single-step tests.",
+            "core_conclusion": "The paper defines a bounded research method, tests it on the stated evaluation setting, and reports a scoped result rather than a universal performance claim.",
             "why_it_matters": "It exposes a reusable evaluation pattern.",
-            "bottom_line": "The evidence is useful but scoped.",
+            "analyst_verdict": "The evidence is useful for the stated setting but remains too scoped for a broader deployment claim.",
+            "evidence_summary": "The controlled comparison supports the main claim, but external validity and ablations remain limited.",
+        },
+        "key_metrics": [
+            {
+                "id": "metric-sample-size",
+                "value": "100",
+                "label": "evaluation cases",
+                "context": "The paper reports one hundred evaluation cases.",
+                "anchors": [anchor()],
+            }
+        ],
+        "paper_narrative": {
+            "research_context": statement("narrative-context", "The paper studies a bounded evaluation problem."),
+            "prior_work_gap": statement("narrative-gap", "Prior work does not test the complete workflow."),
+            "problem_importance": statement("narrative-importance", "Missing workflow checks can hide failures.", attribution="analyst_inference"),
+            "proposed_solution": statement("narrative-solution", "The paper proposes a staged evaluation method."),
+            "main_findings": statement("narrative-findings", "The staged method exposes a measurable limitation."),
         },
         "contributions": [statement("contribution-main", "The paper defines a concrete method.")],
         "method": {
@@ -70,9 +88,25 @@ def sample_analysis(sha256: str = "a" * 64) -> dict[str, Any]:
             key: {"status": "mixed", "summary": f"{key} is present with a limitation.", "anchors": [anchor()]}
             for key in ("study_design", "datasets", "baselines", "metrics", "ablations", "negative_results")
         },
+        "evidence_synthesis": {
+            "experiments": [
+                {
+                    "name": "Controlled comparison",
+                    "scope": "One hundred bounded cases.",
+                    "measures": "Primary outcome and failure count.",
+                    "finding": "The method improves the primary outcome in the tested setting.",
+                    "anchors": [anchor()],
+                }
+            ],
+            "strengths": statement("evidence-strength-summary", "The controlled design makes the main comparison inspectable.", attribution="analyst_inference"),
+            "weaknesses": statement("evidence-weakness-summary", "External validity and ablations remain limited.", attribution="analyst_inference"),
+            "reusability": statement("evidence-reuse-summary", "The staged evaluation can transfer to related workflows.", attribution="derived_lesson"),
+        },
         "claims": [claim],
         "critical_assessment": {
             "strengths": [statement("strength-design", "The comparison is easy to inspect.", attribution="analyst_inference")],
+            "claim_evidence_gaps": [statement("critique-claim-gap", "The strongest claim exceeds the tested setting.", attribution="analyst_inference")],
+            "comparison_to_prior_work": [statement("critique-prior-work", "The method extends a narrower prior evaluation.", attribution="analyst_inference")],
             "limitations": [statement("limitation-scope", "The evaluation covers one setting.")],
             "threats_to_validity": [statement("threat-selection", "Selection effects may limit transfer.", attribution="analyst_inference")],
             "missing_evidence": [statement("missing-cost", "Operational cost is not reported.", evidence="not_reported")],
@@ -86,8 +120,39 @@ def sample_analysis(sha256: str = "a" * 64) -> dict[str, Any]:
         },
         "profile_analysis": {
             "profile": "general",
+            "summary": statement("profile-summary", "The method is moderately transferable to related evaluation work.", attribution="analyst_inference"),
+            "applicability": "medium",
+            "integration_difficulty": "medium",
             "insights": [statement("profile-insight", "The evaluation pattern may transfer to similar studies.", attribution="derived_lesson")],
         },
+        "concepts": [
+            {
+                "id": "concept-controlled-stage",
+                "term": "Controlled stage",
+                "term_en": "Controlled stage",
+                "definition": "A bounded part of the method evaluated under fixed conditions.",
+                "plain_language": "Test one part while keeping the rest stable.",
+                "why_it_matters": "It helps attribute observed differences.",
+                "attribution": "analyst_inference",
+                "confidence": "medium",
+                "evidence_strength": "moderate",
+                "anchors": [anchor()],
+                "tags": ["fixture", "concept"],
+            },
+            {
+                "id": "concept-evidence-boundary",
+                "term": "Evidence boundary",
+                "term_en": "Evidence boundary",
+                "definition": "The scope within which a paper's evidence supports its claims.",
+                "plain_language": "What the experiment can and cannot prove.",
+                "why_it_matters": "It prevents overgeneralization.",
+                "attribution": "derived_lesson",
+                "confidence": "high",
+                "evidence_strength": "moderate",
+                "anchors": [anchor()],
+                "tags": ["fixture", "concept"],
+            },
+        ],
         "open_questions": [statement("question-scale", "Does the result hold at larger scale?", attribution="derived_lesson", evidence="not_reported")],
         "references": [{"label": "Paper", "url": "https://example.org/test-paper.pdf", "kind": "paper"}],
     }
