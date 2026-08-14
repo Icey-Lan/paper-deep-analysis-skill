@@ -1,0 +1,651 @@
+{
+  "schema_version": "0.1.0",
+  "paper": {
+    "stable_id": "2607.28033",
+    "title": "DataClawEval: A Benchmark for Data Engineering Agents in Real Industrial Harness",
+    "authors": [
+      "Debin Meng",
+      "Jiaming Yang",
+      "Zefang Zong",
+      "Tengyue Xu",
+      "Haining Xie",
+      "Yang Li",
+      "Peng Chen"
+    ],
+    "identifiers": {
+      "arxiv": "2607.28033",
+      "doi": null,
+      "sha256": "038c793698ab91ec168f536621744d00a433ee4ef385f90986f0ca4484e13cfc"
+    },
+    "source_url": "https://arxiv.org/abs/2607.28033",
+    "published": "2026-07-30",
+    "updated": "2026-07-30",
+    "license": "unknown (not verified during the local-PDF run)",
+    "venue": "KDD '27 (stated in the PDF; publication status not independently verified)"
+  },
+  "analysis_context": {
+    "language": "zh-CN",
+    "profile": "data-agent",
+    "reader_context": "关注 Data Agent、Agent 辅助数据工程、数据质量与 Agent 持续改进的产品与研究读者",
+    "focus_questions": [
+      "这篇工作是否真正覆盖端到端数据工程，而不只是 Text-to-SQL？",
+      "证据能否支持对 Data Agent 可靠性、跨引擎能力和评测方式的结论？",
+      "哪些机制可以迁移到 Data Agent 产品、数据质量平台和持续学习闭环？"
+    ]
+  },
+  "analysis_boundary": {
+    "basis": "full_text",
+    "model": "OpenAI Codex",
+    "host": "Codex Desktop",
+    "visuals_inspected": [
+      "Figure 2 on PDF page 4",
+      "overall-score formula and evaluation dimensions on PDF page 5",
+      "Table 2 on PDF page 6",
+      "Table 3 and Figure 3 on PDF page 7",
+      "Figure 4 on PDF page 8",
+      "Table 5 and Figure 5 on PDF page 13",
+      "Figure 6, Table 6/7, and Figure 7 on PDF page 14"
+    ],
+    "extraction_warnings": [
+      "Two-column text extraction occasionally interleaves columns; key figures, tables, and quantitative claims were checked against rendered pages.",
+      "The benchmark code, containers, and grader outputs were not executed in this reading run."
+    ]
+  },
+  "executive_summary": {
+    "one_sentence": "DataClawEval 将 Data Agent 评测从单步查询生成推进到真实执行环境中的数据探索、实现、调试、物化与验收，并用任务级确定性 grader 同时检查最终数据产物和工程过程。",
+    "why_it_matters": "对数据工程而言，最危险的问题往往不是 SQL 无法运行，而是任务显示成功却产生错误数据；论文把静默错误、跨引擎差异、重复运行稳定性和工具成本放进同一证据链，直接对应 Data Agent 产品的验收、观测和接管机制。",
+    "bottom_line": "这是一篇对 Data Agent 评测设计很有价值的 benchmark 论文，但不能把其综合分解释为生产成功率，也不能把固定 CodeBuddy scaffold 下的模型后端排名外推为完整 Agent 产品排名；单企业来源、任务重建、单次主实验和缺少跨 Harness/人工基线仍限制结论。"
+  },
+  "contributions": [
+    {
+      "id": "contribution-end-to-end-benchmark",
+      "text": "构建 100 个端到端数据工程任务，覆盖 PySpark、HiveSQL、MySQL、PrestoSQL/Trino 和 FlinkSQL，并要求 Agent 在隔离环境中探索、实现、执行、调试和物化数据产物。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "strong",
+      "anchors": [{"page": 1, "section": "Abstract and 1 Introduction", "figure": null, "table": null, "note": "任务规模、引擎和端到端定位"}],
+      "tags": ["benchmark", "data-agent", "execution"]
+    },
+    {
+      "id": "contribution-construction-pipeline",
+      "text": "从生产代码出发，经脱敏、去重、意图与输入重建、扰动实现和差分执行，形成可执行且能区分正确/错误逻辑的任务。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "moderate",
+      "anchors": [{"page": 4, "section": "3.1 DataClawEval Construction", "figure": "Figure 2", "table": null, "note": "数据集构造上半部分和可辨识性循环"}],
+      "tags": ["dataset-construction", "differential-testing"]
+    },
+    {
+      "id": "contribution-artifact-process-grading",
+      "text": "为每个任务编写确定性评分脚本，既执行并核对 schema、行级、数值和分类字段，也评价探索、执行效率和自验证过程。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "strong",
+      "anchors": [{"page": 5, "section": "3.2 Evaluation Framework", "figure": null, "table": null, "note": "Artifact-oriented 与 process-oriented evaluation"}],
+      "tags": ["data-quality", "grader", "evaluation"]
+    },
+    {
+      "id": "contribution-reliability-analysis",
+      "text": "在统一 scaffold 下比较 16 个模型后端，并进一步分析跨引擎表现、三次重复运行、LLM Judge 偏差、低分失败、超时和工具调用效率。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "strong",
+      "anchors": [{"page": 6, "section": "4 Experiments", "figure": null, "table": "Table 2", "note": "主实验"}, {"page": 7, "section": "5 Analysis", "figure": "Figure 3", "table": "Table 3", "note": "Judge 与稳定性"}, {"page": 13, "section": "Appendix B/C", "figure": "Figure 5", "table": "Table 5", "note": "低分和超时"}],
+      "tags": ["reliability", "stability", "failure-analysis"]
+    }
+  ],
+  "method": {
+    "problem": {
+      "id": "method-problem-end-to-end-gap",
+      "text": "现有 Text-to-SQL 与数据分析 benchmark 多以固定 schema 下的查询或最终答案为目标，缺少对真实数据工程任务中 schema 探索、跨引擎执行、调试、结果物化与过程可靠性的联合评测。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "moderate",
+      "anchors": [{"page": 2, "section": "1 Introduction and Table 1", "figure": null, "table": "Table 1", "note": "论文对代表性 benchmark 的能力维度比较"}],
+      "tags": ["text-to-sql", "evaluation-gap"]
+    },
+    "approach": {
+      "id": "method-approach-two-pipelines",
+      "text": "方法把任务构造和 Agent 评测耦合：先把生产实现转成可公开执行且可辨识的任务，再让 Agent 在按 case 初始化的 Docker 环境中交付产物，由任务专属 grader 给出产物分与过程分。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "strong",
+      "anchors": [{"page": 4, "section": "3 DataClawEval", "figure": "Figure 2", "table": null, "note": "两条流水线总览"}],
+      "tags": ["sandbox", "grader", "workflow"]
+    },
+    "workflow": [
+      {
+        "id": "method-workflow-source-curation",
+        "text": "对专业数据工程师编写的生产代码进行脱敏、去重和分层采样。",
+        "attribution": "paper_claim",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 4, "section": "3.1 Stage 1", "figure": "Figure 2", "table": null, "note": "Dataset construction 起点"}],
+        "tags": ["curation", "privacy"]
+      },
+      {
+        "id": "method-workflow-reconstruct-task",
+        "text": "使用 LLM 根据实现和 schema 重建用户意图与输入表，并通过执行循环修订任务。",
+        "attribution": "paper_claim",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 4, "section": "3.1 Stage 2", "figure": "Figure 2", "table": null, "note": "自动生成的意图和输入不等同于原始生产请求"}],
+        "tags": ["task-reconstruction", "llm-synthesis"]
+      },
+      {
+        "id": "method-workflow-differential-check",
+        "text": "专家扰动正确实现，要求正确实现与扰动实现对合成输入产生可区分输出，以降低“错误实现也能通过”的假阳性。",
+        "attribution": "paper_claim",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 4, "section": "3.1 Stage 3", "figure": "Figure 2", "table": null, "note": "answer-identifiable task construction"}],
+        "tags": ["differential-testing", "test-quality"]
+      },
+      {
+        "id": "method-workflow-build-grader",
+        "text": "任务级 grade.py 根据业务语义检查可执行性、schema、行级结果、数值和分类正确性，并由多名专家审计。",
+        "attribution": "paper_claim",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 5, "section": "3.1 Stage 4/5", "figure": null, "table": null, "note": "任务评分与最终专家验证"}],
+        "tags": ["grader", "human-review", "data-contract"]
+      },
+      {
+        "id": "method-workflow-run-agent",
+        "text": "每个 case 在独立容器中启动所需数据服务和工具；Agent 看不到参考实现与 grader，结束后再在同一环境执行评分。",
+        "attribution": "paper_claim",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 5, "section": "3.2 and 4.1 Settings", "figure": null, "table": null, "note": "隔离执行与信息边界"}],
+        "tags": ["container", "isolation", "evaluation"]
+      }
+    ],
+    "assumptions": [
+      {
+        "id": "assumption-reconstructed-task-fidelity",
+        "text": "LLM 重建后的意图与输入仍足以代表原生产代码对应的工程语义。",
+        "attribution": "analyst_inference",
+        "confidence": "medium",
+        "evidence_strength": "weak",
+        "anchors": [{"page": 4, "section": "3.1 Stage 2", "figure": "Figure 2", "table": null, "note": "论文描述审计，但未给出原始意图与重建意图的一致性指标"}],
+        "tags": ["construct-validity", "task-reconstruction"]
+      },
+      {
+        "id": "assumption-grader-completeness",
+        "text": "任务 grader 覆盖了足以代表业务正确性的字段、边界条件和执行过程。",
+        "attribution": "analyst_inference",
+        "confidence": "medium",
+        "evidence_strength": "weak",
+        "anchors": [{"page": 5, "section": "3.1 Stage 4/5", "figure": null, "table": null, "note": "规则经过专家检查，但未报告 grader 漏检率"}],
+        "tags": ["grader", "business-semantics"]
+      },
+      {
+        "id": "assumption-fixed-harness-controls-model",
+        "text": "固定 CodeBuddy scaffold 能有效控制 Harness 差异，使主表差异主要来自模型后端。",
+        "attribution": "paper_claim",
+        "confidence": "medium",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 6, "section": "4.1 Settings", "figure": null, "table": null, "note": "控制了 scaffold，但没有跨 Harness 消融"}],
+        "tags": ["harness", "model-comparison"]
+      },
+      {
+        "id": "assumption-score-weighting",
+        "text": "多数任务使用的产物 0.7、过程 0.3 权重能够表达数据工程质量的相对重要性。",
+        "attribution": "analyst_inference",
+        "confidence": "medium",
+        "evidence_strength": "weak",
+        "anchors": [{"page": 5, "section": "3.2 Overall score", "figure": null, "table": null, "note": "论文允许任务设计者调整 alpha，但未报告权重敏感性"}],
+        "tags": ["rubric", "weighting"]
+      }
+    ]
+  },
+  "evidence_assessment": {
+    "study_design": {
+      "status": "mixed",
+      "summary": "主实验为 16 个模型后端 × 100 个任务，统一容器和 scaffold；但每个模型—任务组合在主实验只运行一次，随机性没有进入主榜单区间。",
+      "anchors": [{"page": 5, "section": "4.1 Settings", "figure": null, "table": null, "note": "single run per combination"}, {"page": 6, "section": "4.2 Main Results", "figure": null, "table": "Table 2", "note": "主实验规模"}]
+    },
+    "datasets": {
+      "status": "mixed",
+      "summary": "任务由真实企业生产代码衍生且覆盖五种执行引擎，但来源集中于单一企业，并经过脱敏、LLM 重建和输入合成，外部有效性与原业务分布仍有距离。",
+      "anchors": [{"page": 3, "section": "2 Preliminaries", "figure": null, "table": null, "note": "生产代码来源和任务分布"}, {"page": 4, "section": "3.1", "figure": "Figure 2", "table": null, "note": "重建流程"}]
+    },
+    "baselines": {
+      "status": "mixed",
+      "summary": "论文对 16 个前沿模型后端进行了统一比较，并在相关工作中定位既有 benchmark；但没有人类数据工程师基线、原生 Agent 产品基线或跨 Harness 对照。",
+      "anchors": [{"page": 6, "section": "4.1/4.2", "figure": null, "table": "Table 2", "note": "模型后端比较"}, {"page": 8, "section": "6 Related Work", "figure": null, "table": null, "note": "benchmark 定位"}]
+    },
+    "metrics": {
+      "status": "adequate",
+      "summary": "综合分拆分产物与过程，并补充分引擎得分、token、重复运行、pass@3/pass^3、低分错误和超时；指标较全面，但综合权重仍是设计选择。",
+      "anchors": [{"page": 5, "section": "3.2 Evaluation Framework", "figure": null, "table": null, "note": "评分定义"}, {"page": 7, "section": "5.2", "figure": "Figure 3", "table": null, "note": "稳定性指标"}]
+    },
+    "ablations": {
+      "status": "weak",
+      "summary": "论文有 LLM Judge 对照和重复运行分析，但缺少任务重建阶段、grader、alpha 权重、超时阈值、token/成本预算和不同 Harness 的系统消融。",
+      "anchors": [{"page": 5, "section": "3.2", "figure": null, "table": null, "note": "可调权重"}, {"page": 7, "section": "5.1/5.2", "figure": "Figure 3", "table": "Table 3", "note": "现有分析覆盖 Judge 与稳定性"}]
+    },
+    "negative_results": {
+      "status": "adequate",
+      "summary": "附录系统报告 292 个低于 50 分的运行、102 个静默错误、79 个超时和任务/引擎集中性；这比只展示排行榜更能支持可靠性判断。",
+      "anchors": [{"page": 13, "section": "Appendix B/C", "figure": "Figure 5", "table": "Table 5", "note": "低分错误分类和超时"}, {"page": 14, "section": "Appendix C", "figure": "Figure 6", "table": null, "note": "超时对模型均分的影响"}]
+    }
+  },
+  "claims": [
+    {
+      "id": "claim-best-score-headroom",
+      "text": "在论文的统一 CodeBuddy scaffold 和自定义评分下，最高综合分为 74.9，说明该测试集对当前模型仍有区分空间。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "strong",
+      "anchors": [{"page": 6, "section": "4.2 Main Results", "figure": null, "table": "Table 2", "note": "GPT 5.5 overall 74.9"}],
+      "tags": ["benchmark", "score"],
+      "claim_type": "empirical",
+      "support": "Table 2 列出 16 个后端的总体与分引擎得分，范围约 60.3–74.9。"
+    },
+    {
+      "id": "claim-no-model-dominates-engines",
+      "text": "没有单一模型在所有五个引擎上领先，统一总分会掩盖显著的技术栈差异。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "strong",
+      "anchors": [{"page": 6, "section": "4.2 Main Results", "figure": null, "table": "Table 2", "note": "不同列的最佳模型不同，MySQL 与 FlinkSQL 等差异明显"}],
+      "tags": ["cross-engine", "specialization"],
+      "claim_type": "empirical",
+      "support": "Table 2 的分引擎列显示不同模型分别领先，且同一模型跨引擎分差显著。"
+    },
+    {
+      "id": "claim-single-run-insufficient",
+      "text": "单次最好结果不足以表示可靠性；四个代表模型的三次运行出现明显 max@3/min@3 和 pass@3/pass^3 差异。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "moderate",
+      "anchors": [{"page": 7, "section": "5.2 Model Stability Analysis", "figure": "Figure 3", "table": null, "note": "四模型、每任务三次"}, {"page": 8, "section": "5.2 continuation", "figure": null, "table": null, "note": "Hy3 的最高/最低差 26.76，pass 指标差异"}],
+      "tags": ["stability", "repeated-runs"],
+      "claim_type": "empirical",
+      "support": "Figure 3 直接比较四个模型的多次运行分布，但覆盖范围小于主实验。"
+    },
+    {
+      "id": "claim-llm-judge-overestimates",
+      "text": "在 Claude Opus 4.8 的 100 个输出上，两种文本 LLM Judge 均显著高估规则评分，尤其无法可靠验证需要真实执行的过程和流处理语义。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "strong",
+      "anchors": [{"page": 7, "section": "5.1 Rule-Based Grading Is Irreplaceable", "figure": null, "table": "Table 3", "note": "总体 74.3 被评为 82.1/84.4，过程 22.2 被评为 75.0/76.0"}, {"page": 14, "section": "Appendix E", "figure": "Figure 7", "table": "Table 8", "note": "逐 case 膨胀与 FlinkSQL 双向错误"}],
+      "tags": ["llm-judge", "execution-grounding"],
+      "claim_type": "empirical",
+      "support": "Table 3 和 Figure 7 提供总体、维度、引擎与逐 case 的对照。"
+    },
+    {
+      "id": "claim-silent-errors-matter",
+      "text": "1,600 次主实验中有 292 次低于 50 分，其中 102 次没有抛出执行错误却写出了错误结果，说明仅检查运行成功会漏掉大量数据质量风险。",
+      "attribution": "paper_claim",
+      "confidence": "high",
+      "evidence_strength": "strong",
+      "anchors": [{"page": 13, "section": "Appendix B Analysis of Low-Score Runs", "figure": "Figure 5", "table": "Table 5", "note": "292/1600 低分，102/292 silent"}],
+      "tags": ["silent-error", "data-quality"],
+      "claim_type": "empirical",
+      "support": "附录明确给出计数和错误分类；但低于 50 是作者 rubric 的阈值。"
+    },
+    {
+      "id": "claim-more-tools-not-better",
+      "text": "工具调用次数与总体得分近乎不相关，更多调用并不自动带来更好产物。",
+      "attribution": "paper_claim",
+      "confidence": "medium",
+      "evidence_strength": "moderate",
+      "anchors": [{"page": 8, "section": "5.3 Tool Call Efficiency and Task Performance", "figure": "Figure 4", "table": null, "note": "16 个模型的平均调用次数与得分散点"}],
+      "tags": ["tool-use", "efficiency"],
+      "claim_type": "efficiency",
+      "support": "Figure 4 展示聚合层面的弱相关；没有控制任务难度或调用类型，因此不应解释为因果。"
+    }
+  ],
+  "critical_assessment": {
+    "strengths": [
+      {
+        "id": "strength-executable-evidence",
+        "text": "把输出放回真实数据库/计算引擎执行并按业务维度验收，比代码文本相似度或纯文本 Judge 更贴近数据交付。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 5, "section": "3.2 Artifact-oriented evaluation", "figure": null, "table": null, "note": "产物检查维度"}, {"page": 7, "section": "5.1", "figure": null, "table": "Table 3", "note": "与文本 Judge 对照"}],
+        "tags": ["evaluation", "execution"]
+      },
+      {
+        "id": "strength-task-discriminability",
+        "text": "用扰动实现和差分执行检验合成输入的可辨识性，是比“正确实现能运行”更强的测试数据质量控制。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 4, "section": "3.1 Stage 3", "figure": "Figure 2", "table": null, "note": "perturbed code 与 ground truth 比较"}],
+        "tags": ["test-quality", "differential-testing"]
+      },
+      {
+        "id": "strength-failure-taxonomy",
+        "text": "将静默错误、执行错误、环境错误、资源错误与超时分开，使 benchmark 能支持 Harness、模型和环境的不同改进动作。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 13, "section": "Appendix B/C", "figure": "Figure 5", "table": "Table 5", "note": "按引擎和错误类型拆分"}],
+        "tags": ["failure-taxonomy", "observability"]
+      },
+      {
+        "id": "strength-does-not-hide-variance",
+        "text": "论文没有只给总榜单，而是公开引擎差异、多次运行、成本、Judge 偏差和低分任务集中性，分析层次较完整。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 6, "section": "4.2", "figure": null, "table": "Table 2", "note": "分引擎和 token"}, {"page": 7, "section": "5.1/5.2", "figure": "Figure 3", "table": "Table 3", "note": "Judge 和稳定性"}, {"page": 13, "section": "Appendix B/C", "figure": "Figure 5", "table": "Table 5", "note": "低分与超时"}],
+        "tags": ["benchmark-reporting", "transparency"]
+      }
+    ],
+    "limitations": [
+      {
+        "id": "limitation-single-enterprise",
+        "text": "任务源于单一企业并经过脱敏和重建，不能代表全部行业、公司规模、数据治理成熟度和遗留系统。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 3, "section": "2 Preliminaries", "figure": null, "table": null, "note": "数据来源与领域分布"}, {"page": 4, "section": "3.1", "figure": "Figure 2", "table": null, "note": "脱敏与重建"}],
+        "tags": ["external-validity", "enterprise-data"]
+      },
+      {
+        "id": "limitation-main-single-run",
+        "text": "主实验每个模型—任务组合只运行一次，四模型三次重复实验无法为全部 16 个模型的主榜单提供置信区间。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 5, "section": "4.1 Settings", "figure": null, "table": null, "note": "single run"}, {"page": 7, "section": "5.2", "figure": "Figure 3", "table": null, "note": "仅四模型重复"}],
+        "tags": ["variance", "experimental-design"]
+      },
+      {
+        "id": "limitation-fixed-harness",
+        "text": "固定 CodeBuddy scaffold 有利于控制变量，却也使结论只能描述模型后端在该 Harness 中的表现，不能代表 Codex、Claude Code 等原生 Agent 产品的最佳能力。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 6, "section": "4.1 Settings", "figure": null, "table": null, "note": "same Tencent CodeBuddy scaffold"}],
+        "tags": ["harness", "generalization"]
+      },
+      {
+        "id": "limitation-score-not-production-rate",
+        "text": "74.9 是作者定义的产物/过程复合分，不是 74.9% 的生产任务成功率；不同 alpha、grader 和任务难度会改变该数值的含义。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 5, "section": "3.2 Overall score", "figure": null, "table": null, "note": "alpha 加权公式"}, {"page": 6, "section": "4.2", "figure": null, "table": "Table 2", "note": "0–100 综合分"}],
+        "tags": ["metric-interpretation", "rubric"]
+      },
+      {
+        "id": "limitation-no-human-baseline",
+        "text": "没有数据工程师基线、人工接管率、修复时间或真实业务损失，难以判断绝对生产可用门槛。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "not_reported",
+        "anchors": [{"page": 5, "section": "4.1 Settings", "figure": null, "table": null, "note": "实验设置只比较模型后端"}],
+        "tags": ["human-baseline", "production-readiness"]
+      },
+      {
+        "id": "limitation-task-scope",
+        "text": "任务重点是实现和物化处理逻辑，尚未充分覆盖数据接入、契约演进、权限治理、血缘、编排、回填、长期 SLA 和事故响应。",
+        "attribution": "analyst_inference",
+        "confidence": "medium",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 3, "section": "2 Preliminaries", "figure": null, "table": null, "note": "任务类型分布"}, {"page": 11, "section": "Appendix A Task inventory", "figure": null, "table": null, "note": "100 个任务清单"}],
+        "tags": ["data-engineering", "scope"]
+      }
+    ],
+    "threats_to_validity": [
+      {
+        "id": "threat-synthetic-intent",
+        "text": "意图和输入表由 LLM 重建，可能把真实生产中模糊需求、组织语境和脏数据压力简化为更可评分的任务。",
+        "attribution": "analyst_inference",
+        "confidence": "medium",
+        "evidence_strength": "weak",
+        "anchors": [{"page": 4, "section": "3.1 Stage 2", "figure": "Figure 2", "table": null, "note": "LLM reconstruction"}],
+        "tags": ["construct-validity", "synthetic-data"]
+      },
+      {
+        "id": "threat-grader-as-ground-truth",
+        "text": "论文把规则 grader 当作 ground truth；它比文本 Judge 更可执行，但仍可能漏掉未编码的业务约束或允许某些错误等价类。",
+        "attribution": "analyst_inference",
+        "confidence": "medium",
+        "evidence_strength": "weak",
+        "anchors": [{"page": 5, "section": "3.1 Stage 4/5", "figure": null, "table": null, "note": "grader 设计与验证"}, {"page": 7, "section": "5.1", "figure": null, "table": "Table 3", "note": "rule-based 被设为 GT"}],
+        "tags": ["grader", "ground-truth"]
+      },
+      {
+        "id": "threat-model-version-drift",
+        "text": "商业/前沿模型版本和服务行为会变化，表中排名是特定时间、后端和配置的快照。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 6, "section": "4.1/4.2", "figure": null, "table": "Table 2", "note": "具体模型版本列表"}],
+        "tags": ["model-drift", "reproducibility"]
+      },
+      {
+        "id": "threat-bilingual-confounding",
+        "text": "中英文任务不是同题翻译，71.7 与 68.2 的差异受任务难度混杂，不能归因于语言能力。",
+        "attribution": "paper_claim",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 14, "section": "Appendix D", "figure": null, "table": "Table 6 and Table 7", "note": "作者明确提示不是平行翻译"}],
+        "tags": ["bilingual", "confounding"]
+      }
+    ],
+    "missing_evidence": [
+      {
+        "id": "missing-harness-ablation",
+        "text": "缺少同一模型跨不同 Agent Harness 的对照，无法分离模型、Harness、工具接口和恢复策略的交互效应。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "not_reported",
+        "anchors": [{"page": 6, "section": "4.1 Settings", "figure": null, "table": null, "note": "所有模型固定同一 scaffold"}],
+        "tags": ["harness", "ablation"]
+      },
+      {
+        "id": "missing-weight-sensitivity",
+        "text": "缺少产物/过程权重 alpha 和各 grader 子项权重的敏感性分析。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "not_reported",
+        "anchors": [{"page": 5, "section": "3.2 Overall score", "figure": null, "table": null, "note": "多数任务 alpha=0.7，可调整但未分析"}],
+        "tags": ["sensitivity", "rubric"]
+      },
+      {
+        "id": "missing-grader-agreement",
+        "text": "缺少 grader 漏检率、专家间一致性和对隐藏边界条件的覆盖率。",
+        "attribution": "analyst_inference",
+        "confidence": "medium",
+        "evidence_strength": "not_reported",
+        "anchors": [{"page": 5, "section": "3.1 Stage 4/5", "figure": null, "table": null, "note": "描述专家审计但无一致性统计"}],
+        "tags": ["grader", "human-review"]
+      },
+      {
+        "id": "missing-cost-latency",
+        "text": "报告 token 与超时，但缺少端到端货币成本、延迟分布、基础设施资源和人工接管时间。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "not_reported",
+        "anchors": [{"page": 6, "section": "4.2", "figure": null, "table": "Table 2", "note": "只报告平均 token"}, {"page": 13, "section": "Appendix C", "figure": "Figure 6", "table": null, "note": "超时计数"}],
+        "tags": ["cost", "latency"]
+      },
+      {
+        "id": "missing-longitudinal-learning",
+        "text": "没有研究 Agent 是否能从失败中持续学习、Skill 更新后是否回归、或多轮部署后错误是否减少；论文是静态评测，不是自进化实验。",
+        "attribution": "analyst_inference",
+        "confidence": "high",
+        "evidence_strength": "not_reported",
+        "anchors": [{"page": 5, "section": "4.1 Settings", "figure": null, "table": null, "note": "每次运行独立，未描述跨任务持久学习"}, {"page": 7, "section": "5.2", "figure": "Figure 3", "table": null, "note": "重复运行用于测稳定性，不是学习"}],
+        "tags": ["continual-learning", "self-evolution"]
+      }
+    ],
+    "overall_judgment": {
+      "id": "judgment-high-value-benchmark",
+      "text": "DataClawEval 对 Data Agent 的最大价值不是提供一个可营销的总分，而是给出“可执行任务 + 可辨识输入 + 确定性产物验收 + 过程轨迹 + 失败分类 + 重复运行”的评测骨架；若补上跨 Harness、人工基线、长期运维和持续学习回归，它更可能接近真实数据工程准入体系。",
+      "attribution": "analyst_inference",
+      "confidence": "high",
+      "evidence_strength": "moderate",
+      "anchors": [{"page": 4, "section": "3.1", "figure": "Figure 2", "table": null, "note": "构造与评测闭环"}, {"page": 5, "section": "3.2", "figure": null, "table": null, "note": "产物和过程评分"}, {"page": 13, "section": "Appendix B/C", "figure": "Figure 5", "table": "Table 5", "note": "失败分类"}],
+      "tags": ["data-agent", "evaluation-design"]
+    }
+  },
+  "reproducibility": {
+    "code": "available",
+    "data": "available",
+    "environment": "specified",
+    "replication_notes": {
+      "id": "reproduction-expensive-not-rerun",
+      "text": "PDF 给出 GitHub 链接并声明发布数据集、容器和确定性脚本；但完整复现需要五种引擎、100 个任务和多个模型后端，本次只验证论文读取与报告生成，未运行 benchmark，不能确认其数值可复现。",
+      "attribution": "analyst_inference",
+      "confidence": "high",
+      "evidence_strength": "moderate",
+      "anchors": [{"page": 1, "section": "Abstract", "figure": null, "table": null, "note": "代码链接和发布声明"}, {"page": 5, "section": "3.2/4.1", "figure": null, "table": null, "note": "容器、引擎与运行设置"}],
+      "tags": ["reproducibility", "cost"]
+    }
+  },
+  "profile_analysis": {
+    "profile": "data-agent",
+    "insights": [
+      {
+        "id": "profile-product-task-contract",
+        "text": "Data Agent 产品应把任务建模为需求、输入数据、转换逻辑、输出契约和验证证据，而不是只有自然语言与 SQL 文本。",
+        "attribution": "derived_lesson",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 4, "section": "3.1", "figure": "Figure 2", "table": null, "note": "意图、输入、实现、grader 的闭环"}, {"page": 5, "section": "3.2", "figure": null, "table": null, "note": "产物验收维度"}],
+        "tags": ["product-design", "data-contract"]
+      },
+      {
+        "id": "profile-silent-error-gate",
+        "text": "“运行成功”不能作为上线闸门；Data Agent 必须自动检查 schema、行数、关键切片、数值边界、分类字段和业务不变量，并把证据附在交付物旁。",
+        "attribution": "derived_lesson",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 5, "section": "3.2 Artifact-oriented evaluation", "figure": null, "table": null, "note": "评分维度"}, {"page": 13, "section": "Appendix B", "figure": "Figure 5", "table": "Table 5", "note": "102 个静默错误"}],
+        "tags": ["data-quality", "silent-error"]
+      },
+      {
+        "id": "profile-segment-by-stack",
+        "text": "评测和发布准入应按 PySpark、Hive、MySQL、Trino、Flink 等技术栈及任务类型拆分，不能用一个均分替代目标客户真实数据栈。",
+        "attribution": "derived_lesson",
+        "confidence": "high",
+        "evidence_strength": "strong",
+        "anchors": [{"page": 6, "section": "4.2", "figure": null, "table": "Table 2", "note": "分引擎性能差异"}],
+        "tags": ["segmentation", "data-stack"]
+      },
+      {
+        "id": "profile-separate-model-harness-environment",
+        "text": "失败归因至少要分成模型推理、Harness/工具、执行环境、数据契约和 grader 五层，否则模型升级会掩盖系统设计问题。",
+        "attribution": "derived_lesson",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 5, "section": "3.2", "figure": null, "table": null, "note": "隔离环境和过程评分"}, {"page": 13, "section": "Appendix B/C", "figure": "Figure 5", "table": "Table 5", "note": "环境、资源和超时错误"}],
+        "tags": ["harness", "failure-attribution"]
+      },
+      {
+        "id": "profile-observability-first",
+        "text": "数据工程 Agent 的核心产品能力包括可观测轨迹、失败分类、成本/超时边界和人工接管点，而不仅是生成代码的交互界面。",
+        "attribution": "derived_lesson",
+        "confidence": "high",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 5, "section": "3.2 Process-oriented evaluation", "figure": null, "table": null, "note": "探索、效率、自验证"}, {"page": 13, "section": "Appendix C", "figure": "Figure 6", "table": null, "note": "超时影响"}],
+        "tags": ["observability", "human-in-the-loop"]
+      },
+      {
+        "id": "profile-continual-learning-regression",
+        "text": "若让 Agent 从失败中自我更新 Skill，每次更新都应重放历史失败与隐藏任务，比较最差表现、稳定成功率和新回归；论文的确定性 grader 可作为学习闸门，但论文并未验证自进化。",
+        "attribution": "derived_lesson",
+        "confidence": "medium",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 5, "section": "3.2", "figure": null, "table": null, "note": "确定性任务级 grader"}, {"page": 7, "section": "5.2", "figure": "Figure 3", "table": null, "note": "稳定性指标可用于回归门禁"}],
+        "tags": ["continual-learning", "regression-testing", "self-evolution"]
+      },
+      {
+        "id": "profile-career-leverage",
+        "text": "对数据质量与产品背景的从业者，最有差异化的能力是把业务口径、验收规则、失败风险和接管机制产品化；不需要把价值叙述缩减为手写更多 SQL。",
+        "attribution": "derived_lesson",
+        "confidence": "medium",
+        "evidence_strength": "moderate",
+        "anchors": [{"page": 5, "section": "3.2", "figure": null, "table": null, "note": "业务语义驱动的产物和过程评分"}, {"page": 13, "section": "Appendix B", "figure": "Figure 5", "table": "Table 5", "note": "失败风险需要规则与产品机制"}],
+        "tags": ["career", "data-quality", "product-management"]
+      },
+      {
+        "id": "profile-hidden-test-maintenance",
+        "text": "公开 benchmark 容易被针对性优化；开源评测应保留版本化隐藏集、持续补充真实失败变体，并记录 Skill/模型/环境版本。",
+        "attribution": "derived_lesson",
+        "confidence": "medium",
+        "evidence_strength": "weak",
+        "anchors": [{"page": 4, "section": "3.1 Stage 3/4", "figure": "Figure 2", "table": null, "note": "扰动与 grader 为持续扩充提供机制"}],
+        "tags": ["benchmark-maintenance", "hidden-tests"]
+      }
+    ]
+  },
+  "open_questions": [
+    {
+      "id": "question-cross-harness",
+      "text": "同一模型在 CodeBuddy、Codex、Claude Code 等不同 Harness 中的排名和失败类型会如何变化？",
+      "attribution": "derived_lesson",
+      "confidence": "high",
+      "evidence_strength": "not_reported",
+      "anchors": [{"page": 6, "section": "4.1 Settings", "figure": null, "table": null, "note": "当前只固定 CodeBuddy"}],
+      "tags": ["harness", "future-work"]
+    },
+    {
+      "id": "question-human-baseline",
+      "text": "专业数据工程师在同一时间、工具和信息约束下的成功率、成本和失败类型是什么？",
+      "attribution": "derived_lesson",
+      "confidence": "high",
+      "evidence_strength": "not_reported",
+      "anchors": [{"page": 5, "section": "4.1 Settings", "figure": null, "table": null, "note": "未提供人工执行基线"}],
+      "tags": ["human-baseline", "future-work"]
+    },
+    {
+      "id": "question-grader-coverage",
+      "text": "任务级 grader 对未编码业务约束的漏检率是多少，专家之间能否稳定复现相同 rubric？",
+      "attribution": "derived_lesson",
+      "confidence": "medium",
+      "evidence_strength": "not_reported",
+      "anchors": [{"page": 5, "section": "3.1 Stage 4/5", "figure": null, "table": null, "note": "专家验证未量化"}],
+      "tags": ["grader", "future-work"]
+    },
+    {
+      "id": "question-production-coverage",
+      "text": "加入权限、血缘、数据契约变更、回填、调度和长期 SLA 后，当前结果还能否保持？",
+      "attribution": "derived_lesson",
+      "confidence": "medium",
+      "evidence_strength": "not_reported",
+      "anchors": [{"page": 3, "section": "2 Preliminaries", "figure": null, "table": null, "note": "现有工作流范围"}],
+      "tags": ["production", "data-governance"]
+    },
+    {
+      "id": "question-continual-improvement",
+      "text": "Agent 是否能根据确定性失败证据更新 Skill，同时在隐藏任务上避免灾难性遗忘和奖励黑客？",
+      "attribution": "derived_lesson",
+      "confidence": "medium",
+      "evidence_strength": "not_reported",
+      "anchors": [{"page": 5, "section": "3.2", "figure": null, "table": null, "note": "grader 可提供反馈，但论文没有持续学习环节"}],
+      "tags": ["continual-learning", "reward-hacking"]
+    },
+    {
+      "id": "question-cost-aware-frontier",
+      "text": "如果同时约束货币成本、延迟、资源和人工接管，哪些模型/Harness 组合位于真实可部署的 Pareto 前沿？",
+      "attribution": "derived_lesson",
+      "confidence": "medium",
+      "evidence_strength": "not_reported",
+      "anchors": [{"page": 6, "section": "4.2", "figure": null, "table": "Table 2", "note": "只报告 token"}, {"page": 8, "section": "5.3", "figure": "Figure 4", "table": null, "note": "工具次数与分数"}],
+      "tags": ["cost", "deployment"]
+    }
+  ],
+  "references": [
+    {
+      "label": "arXiv abstract page",
+      "url": "https://arxiv.org/abs/2607.28033",
+      "kind": "paper"
+    },
+    {
+      "label": "DataClawEval repository stated in the PDF",
+      "url": "https://github.com/Dicemy/DataClawEval/tree/master",
+      "kind": "code"
+    }
+  ]
+}

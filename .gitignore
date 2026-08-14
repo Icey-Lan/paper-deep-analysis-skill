@@ -1,0 +1,21 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Inputs and intermediate full text are intentionally local-only.
+*.pdf
+.work/
+work/
+sources/
+outputs/
+
+# Local run artifacts can contain source URLs or machine paths.
+runs/
+tmp/
+audit/screenshots/
+.eval-workspace/

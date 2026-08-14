@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1.0",
+  "status": "ready",
+  "input_kind": "arxiv",
+  "source_name": "2607.28033.pdf",
+  "source_url": "https://arxiv.org/abs/2607.28033",
+  "sha256": "038c793698ab91ec168f536621744d00a433ee4ef385f90986f0ca4484e13cfc",
+  "file_bytes": 1072730,
+  "stable_id": "2607.28033",
+  "retrieved_at": "2026-08-14T06:17:46+00:00",
+  "page_count": 16,
+  "text_chars": 80271,
+  "title": "DataClawEval: A Benchmark for Data Engineering Agents in Real Industrial Harness",
+  "authors": [
+    "Debin Meng",
+    "Jiaming Yang",
+    "Zefang Zong",
+    "Tengyue Xu",
+    "Haining Xie",
+    "Yang Li",
+    "Peng Chen"
+  ],
+  "arxiv": "2607.28033",
+  "doi": null,
+  "published": "2026-07-30",
+  "updated": "2026-07-30",
+  "license": "unknown",
+  "extraction_engine": "pypdf 6.16.0",
+  "warnings": []
+}

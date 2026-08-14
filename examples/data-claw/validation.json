@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1.0",
+  "validated_at": "2026-08-14T06:20:11+00:00",
+  "status": "pass",
+  "checks_passed": [
+    "analysis-schema",
+    "analysis-semantics",
+    "dataset-identity",
+    "dataset-public-safety",
+    "dataset-schema",
+    "html-offline",
+    "html-public-safety",
+    "html-structure",
+    "manifest-public-safety",
+    "manifest-schema",
+    "run-identity",
+    "run-public-safety",
+    "run-schema",
+    "source-identity"
+  ],
+  "errors": [],
+  "warnings": []
+}
