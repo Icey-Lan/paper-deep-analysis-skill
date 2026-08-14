@@ -15,7 +15,8 @@
       with BSD-licensed pypdf.
 - [ ] README screenshots match the current renderer.
 - [x] Known limitations and AI-assistance disclosure are visible.
-- [ ] Repository history contains no ignored PDF or extracted full text (verify
-      again after the first local commit).
+- [x] Local repository history contains no PDF, `pages.jsonl`, `source.pdf`,
+      `.env`, detected secret, or user-specific absolute path after checkpoint
+      commit `6cce3f1`.
 - [ ] Human owner confirms repository name, attribution, and GitHub remote before
       any push.

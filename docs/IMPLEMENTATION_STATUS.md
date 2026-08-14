@@ -24,7 +24,7 @@ Agent-learning export. Existing Tracker changes were protected in local commit
 | HTML and JSONL artifacts | Complete, under visual review | Offline renderer, escaping, semantic checks, 56-record live example |
 | Automated quality suite | Complete for v0.1 code paths | 43 tests passed; 82% measured code coverage; no accuracy claim |
 | Visual and print QA | Blocked | In-app browser rejected local file URL; static HTML checks pass, screenshot review remains required |
-| Public release audit | Pending | Dependency/license/history/secret scan and owner confirmation |
+| Public release audit | Partially complete | License, candidate-file, secret, path, and local-history checks pass; visual review and owner confirmation remain |
 
 ## Current limitations
 
