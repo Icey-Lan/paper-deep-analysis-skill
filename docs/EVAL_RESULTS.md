@@ -35,7 +35,7 @@ Updated: 2026-08-14
 - Deterministic release packaging produced 29 runtime files. Repeated builds
   matched byte-for-byte; the current ZIP SHA-256 is
   `56092176ba6a5ec2cb21bcc5282e6cb7258270a4713e99afcb5df364a6062f8e`.
-- Release audit passed for 60 candidate repository files at this checkpoint.
+- Release audit passed for 59 candidate repository files at this checkpoint.
 
 ## What these results do not establish
 
