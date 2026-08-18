@@ -1,0 +1,14 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "replace-with-run-id",
+  "created_at": "replace-with-ISO-8601-time",
+  "host": "replace-with-actual-Agent-host",
+  "model": "replace-with-actual-model",
+  "external_model_api_used": false,
+  "analysis_basis": "full_text",
+  "profile": "general",
+  "input_kind": "replace-with-local_pdf-public_pdf_url-arxiv-or-landing_page",
+  "source_sha256": "replace-with-source-sha256",
+  "validation_status": "replace-with-pass-or-fail",
+  "warnings": []
+}

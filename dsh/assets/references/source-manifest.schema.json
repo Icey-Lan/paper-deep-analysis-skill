@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/paper-deep-analysis/source-manifest.schema.json",
+  "title": "Public-safe source manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "status", "input_kind", "source_name", "source_url",
+    "sha256", "file_bytes", "stable_id", "retrieved_at", "page_count",
+    "text_chars", "title", "authors", "arxiv", "doi", "published",
+    "updated", "license", "extraction_engine", "warnings"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "status": {"enum": ["ready", "ocr_required"]},
+    "input_kind": {"enum": ["local_pdf", "public_url", "landing_page", "arxiv"]},
+    "source_name": {"type": "string", "minLength": 1, "maxLength": 300},
+    "source_url": {"type": ["string", "null"], "format": "uri"},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "file_bytes": {"type": "integer", "minimum": 1},
+    "stable_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+    "retrieved_at": {"type": "string", "format": "date-time"},
+    "page_count": {"type": "integer", "minimum": 1},
+    "text_chars": {"type": "integer", "minimum": 0},
+    "title": {"type": ["string", "null"], "maxLength": 1000},
+    "authors": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 300}},
+    "arxiv": {"type": ["string", "null"], "maxLength": 50},
+    "doi": {"type": ["string", "null"], "maxLength": 300},
+    "published": {"type": ["string", "null"], "format": "date"},
+    "updated": {"type": ["string", "null"], "format": "date"},
+    "license": {"type": "string", "minLength": 1, "maxLength": 500},
+    "extraction_engine": {"type": "string", "minLength": 1, "maxLength": 200},
+    "warnings": {"type": "array", "items": {"type": "string", "maxLength": 1000}}
+  }
+}

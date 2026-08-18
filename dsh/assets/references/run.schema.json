@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/paper-deep-analysis/run.schema.json",
+  "title": "Paper analysis run record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_id", "created_at", "host", "model",
+    "external_model_api_used", "analysis_basis", "profile", "input_kind",
+    "source_sha256", "validation_status", "warnings"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "host": {"type": "string", "minLength": 1, "maxLength": 200},
+    "model": {"type": "string", "minLength": 1, "maxLength": 200},
+    "external_model_api_used": {"type": "boolean"},
+    "analysis_basis": {"enum": ["full_text", "partial_text", "abstract_only"]},
+    "profile": {
+      "enum": [
+        "general", "agent-systems", "agent-evaluation", "harness", "memory",
+        "continual-learning", "multi-agent", "tool-use", "reasoning-planning",
+        "data-agent", "embodied-agent", "custom"
+      ]
+    },
+    "input_kind": {"enum": ["local_pdf", "public_url", "landing_page", "arxiv"]},
+    "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "validation_status": {"enum": ["pending", "pass", "fail"]},
+    "warnings": {"type": "array", "items": {"type": "string", "maxLength": 1000}}
+  }
+}

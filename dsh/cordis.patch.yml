@@ -1,0 +1,6 @@
+# dsh-plugin-paper-deep-analysis bundle patch.
+# Mounts the plugin, which registers the `paper-deep-analysis` skill provider
+# on ctx.skills. A later patch layer may override this row's config by id.
+- insert:
+    - id: paper-deep-analysis
+      name: dsh-plugin-paper-deep-analysis

@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/paper-deep-analysis/analysis.schema.json",
+  "title": "Paper deep analysis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "paper",
+    "analysis_context",
+    "analysis_boundary",
+    "executive_summary",
+    "paper_narrative",
+    "contributions",
+    "method",
+    "evidence_assessment",
+    "evidence_synthesis",
+    "claims",
+    "critical_assessment",
+    "reproducibility",
+    "profile_analysis",
+    "concepts",
+    "open_questions",
+    "references"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "paper": {"$ref": "#/$defs/paper"},
+    "analysis_context": {"$ref": "#/$defs/context"},
+    "analysis_boundary": {"$ref": "#/$defs/boundary"},
+    "executive_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "core_conclusion", "why_it_matters", "analyst_verdict", "evidence_summary"],
+      "properties": {
+        "headline": {"type": "string", "minLength": 1, "maxLength": 180},
+        "core_conclusion": {"type": "string", "minLength": 40, "maxLength": 600},
+        "why_it_matters": {"$ref": "#/$defs/nonEmpty"},
+        "analyst_verdict": {"type": "string", "minLength": 20, "maxLength": 1200},
+        "evidence_summary": {"type": "string", "minLength": 1, "maxLength": 1200}
+      }
+    },
+    "paper_narrative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["research_context", "prior_work_gap", "problem_importance", "proposed_solution", "main_findings"],
+      "properties": {
+        "research_context": {"$ref": "#/$defs/statement"},
+        "prior_work_gap": {"$ref": "#/$defs/statement"},
+        "problem_importance": {"$ref": "#/$defs/statement"},
+        "proposed_solution": {"$ref": "#/$defs/statement"},
+        "main_findings": {"$ref": "#/$defs/statement"}
+      }
+    },
+    "key_metrics": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {"$ref": "#/$defs/keyMetric"}
+    },
+    "contributions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/statement"}
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["problem", "approach", "workflow", "assumptions"],
+      "properties": {
+        "problem": {"$ref": "#/$defs/statement"},
+        "approach": {"$ref": "#/$defs/statement"},
+        "workflow": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/statement"}
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/statement"}
+        }
+      }
+    },
+    "evidence_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["study_design", "datasets", "baselines", "metrics", "ablations", "negative_results"],
+      "properties": {
+        "study_design": {"$ref": "#/$defs/assessmentItem"},
+        "datasets": {"$ref": "#/$defs/assessmentItem"},
+        "baselines": {"$ref": "#/$defs/assessmentItem"},
+        "metrics": {"$ref": "#/$defs/assessmentItem"},
+        "ablations": {"$ref": "#/$defs/assessmentItem"},
+        "negative_results": {"$ref": "#/$defs/assessmentItem"}
+      }
+    },
+    "evidence_synthesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["experiments", "strengths", "weaknesses", "reusability"],
+      "properties": {
+        "experiments": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/experiment"}},
+        "strengths": {"$ref": "#/$defs/statement"},
+        "weaknesses": {"$ref": "#/$defs/statement"},
+        "reusability": {"$ref": "#/$defs/statement"}
+      }
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/claim"}
+    },
+    "critical_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strengths", "claim_evidence_gaps", "comparison_to_prior_work", "limitations", "threats_to_validity", "missing_evidence", "overall_judgment"],
+      "properties": {
+        "strengths": {"type": "array", "items": {"$ref": "#/$defs/statement"}},
+        "claim_evidence_gaps": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "comparison_to_prior_work": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "limitations": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/statement"}},
+        "threats_to_validity": {"type": "array", "items": {"$ref": "#/$defs/statement"}},
+        "missing_evidence": {"type": "array", "items": {"$ref": "#/$defs/statement"}},
+        "overall_judgment": {"$ref": "#/$defs/statement"}
+      }
+    },
+    "reproducibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "data", "environment", "replication_notes"],
+      "properties": {
+        "code": {"enum": ["available", "partial", "not_reported", "unavailable"]},
+        "data": {"enum": ["available", "partial", "not_reported", "unavailable", "not_applicable"]},
+        "environment": {"enum": ["specified", "partial", "not_reported"]},
+        "replication_notes": {"$ref": "#/$defs/statement"}
+      }
+    },
+    "profile_analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "summary", "applicability", "integration_difficulty", "insights"],
+      "properties": {
+        "profile": {"$ref": "#/$defs/profileName"},
+        "summary": {"$ref": "#/$defs/statement"},
+        "applicability": {"enum": ["high", "medium", "low", "not_applicable"]},
+        "integration_difficulty": {"enum": ["high", "medium", "low", "unknown", "not_applicable"]},
+        "insights": {"type": "array", "items": {"$ref": "#/$defs/statement"}}
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": {"$ref": "#/$defs/concept"}
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/statement"}
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "url", "kind"],
+        "properties": {
+          "label": {"$ref": "#/$defs/nonEmpty"},
+          "url": {"type": "string", "format": "uri", "pattern": "^https://"},
+          "kind": {"enum": ["paper", "code", "data", "project", "related"]}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmpty": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "paper": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stable_id", "title", "authors", "identifiers", "source_url", "published", "updated", "license"],
+      "properties": {
+        "stable_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "authors": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1, "maxLength": 300}},
+        "identifiers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["arxiv", "doi", "sha256"],
+          "properties": {
+            "arxiv": {"type": ["string", "null"], "maxLength": 50},
+            "doi": {"type": ["string", "null"], "maxLength": 300},
+            "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+          }
+        },
+        "source_url": {"type": ["string", "null"], "format": "uri"},
+        "published": {"type": ["string", "null"], "format": "date"},
+        "updated": {"type": ["string", "null"], "format": "date"},
+        "license": {"type": "string", "minLength": 1, "maxLength": 500},
+        "venue": {"type": ["string", "null"], "maxLength": 500}
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "profile", "reader_context", "focus_questions"],
+      "properties": {
+        "language": {"type": "string", "minLength": 2, "maxLength": 50},
+        "profile": {"$ref": "#/$defs/profileName"},
+        "reader_context": {"type": "string", "maxLength": 2000},
+        "focus_questions": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 1000}}
+      }
+    },
+    "boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["basis", "model", "host", "visuals_inspected", "extraction_warnings"],
+      "properties": {
+        "basis": {"enum": ["full_text", "partial_text", "abstract_only"]},
+        "model": {"type": "string", "minLength": 1, "maxLength": 200},
+        "host": {"type": "string", "minLength": 1, "maxLength": 200},
+        "visuals_inspected": {"type": "array", "items": {"type": "string", "maxLength": 300}},
+        "extraction_warnings": {"type": "array", "items": {"type": "string", "maxLength": 1000}}
+      }
+    },
+    "anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page", "section", "figure", "table", "note"],
+      "properties": {
+        "page": {"type": ["integer", "null"], "minimum": 1},
+        "section": {"type": ["string", "null"], "maxLength": 300},
+        "figure": {"type": ["string", "null"], "maxLength": 100},
+        "table": {"type": ["string", "null"], "maxLength": 100},
+        "note": {"type": "string", "maxLength": 500}
+      },
+      "anyOf": [
+        {"required": ["page"], "properties": {"page": {"type": "integer"}}},
+        {"required": ["section"], "properties": {"section": {"type": "string", "minLength": 1}}}
+      ]
+    },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "attribution", "confidence", "evidence_strength", "anchors", "tags"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,79}$"},
+        "text": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "attribution": {"enum": ["paper_claim", "analyst_inference", "derived_lesson"]},
+        "confidence": {"enum": ["high", "medium", "low"]},
+        "evidence_strength": {"enum": ["strong", "moderate", "weak", "not_reported"]},
+        "anchors": {"type": "array", "items": {"$ref": "#/$defs/anchor"}},
+        "tags": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,49}$"}, "uniqueItems": true}
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "attribution", "confidence", "evidence_strength", "anchors", "tags", "claim_type", "support"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,79}$"},
+        "text": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "attribution": {"enum": ["paper_claim", "analyst_inference", "derived_lesson"]},
+        "confidence": {"enum": ["high", "medium", "low"]},
+        "evidence_strength": {"enum": ["strong", "moderate", "weak", "not_reported"]},
+        "anchors": {"type": "array", "items": {"$ref": "#/$defs/anchor"}},
+        "tags": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,49}$"}, "uniqueItems": true},
+        "claim_type": {"enum": ["novelty", "method", "empirical", "efficiency", "generalization", "safety", "limitation", "other"]},
+        "support": {"type": "string", "minLength": 1, "maxLength": 2000}
+      }
+    },
+    "assessmentItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "summary", "anchors"],
+      "properties": {
+        "status": {"enum": ["adequate", "mixed", "weak", "not_reported", "not_applicable"]},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 3000},
+        "anchors": {"type": "array", "items": {"$ref": "#/$defs/anchor"}}
+      }
+    },
+    "profileName": {
+      "enum": [
+        "general", "agent-systems", "agent-evaluation", "harness", "memory",
+        "continual-learning", "multi-agent", "tool-use", "reasoning-planning",
+        "data-agent", "embodied-agent", "custom"
+      ]
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "scope", "measures", "finding", "anchors"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 300},
+        "scope": {"type": "string", "minLength": 1, "maxLength": 1200},
+        "measures": {"type": "string", "minLength": 1, "maxLength": 1200},
+        "finding": {"type": "string", "minLength": 1, "maxLength": 1600},
+        "anchors": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/anchor"}}
+      }
+    },
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "term", "term_en", "definition", "plain_language", "why_it_matters", "attribution", "confidence", "evidence_strength", "anchors", "tags"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,79}$"},
+        "term": {"type": "string", "minLength": 1, "maxLength": 200},
+        "term_en": {"type": ["string", "null"], "maxLength": 200},
+        "definition": {"type": "string", "minLength": 1, "maxLength": 1600},
+        "plain_language": {"type": "string", "minLength": 1, "maxLength": 1600},
+        "why_it_matters": {"type": "string", "minLength": 1, "maxLength": 1600},
+        "attribution": {"enum": ["paper_claim", "analyst_inference", "derived_lesson"]},
+        "confidence": {"enum": ["high", "medium", "low"]},
+        "evidence_strength": {"enum": ["strong", "moderate", "weak", "not_reported"]},
+        "anchors": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/anchor"}},
+        "tags": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,49}$"}, "uniqueItems": true}
+      }
+    },
+    "keyMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "value", "label", "context", "anchors"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,79}$"},
+        "value": {"type": "string", "minLength": 1, "maxLength": 40},
+        "label": {"type": "string", "minLength": 1, "maxLength": 120},
+        "context": {"type": "string", "minLength": 1, "maxLength": 500},
+        "anchors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/anchor"}
+        }
+      }
+    }
+  }
+}

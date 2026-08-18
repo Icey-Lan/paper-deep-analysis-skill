@@ -1,0 +1,93 @@
+{
+  "schema_version": "0.1.0",
+  "paper": {
+    "stable_id": "replace-with-stable-id",
+    "title": "Replace with paper title",
+    "authors": ["Replace with author"],
+    "identifiers": {
+      "arxiv": null,
+      "doi": null,
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "source_url": null,
+    "published": null,
+    "updated": null,
+    "license": "unknown",
+    "venue": null
+  },
+  "analysis_context": {
+    "language": "zh-CN",
+    "profile": "general",
+    "reader_context": "",
+    "focus_questions": []
+  },
+  "analysis_boundary": {
+    "basis": "full_text",
+    "model": "Replace with actual model identity",
+    "host": "Replace with actual Agent host",
+    "visuals_inspected": [],
+    "extraction_warnings": []
+  },
+  "executive_summary": {
+    "headline": "Replace with a concise, plain-language statement of the central contribution or finding.",
+    "core_conclusion": "Replace with two short, formula-free sentences: the familiar-language problem, then the approach and clearest supported result.",
+    "why_it_matters": "Replace with a concrete reason this matters.",
+    "analyst_verdict": "Replace with a calibrated analyst judgment and its boundary.",
+    "evidence_summary": "Replace with one concrete sentence explaining what the evidence does and does not support."
+  },
+  "key_metrics": [],
+  "paper_narrative": {
+    "research_context": {},
+    "prior_work_gap": {},
+    "problem_importance": {},
+    "proposed_solution": {},
+    "main_findings": {}
+  },
+  "contributions": [],
+  "method": {
+    "problem": {},
+    "approach": {},
+    "workflow": [],
+    "assumptions": []
+  },
+  "evidence_assessment": {
+    "study_design": {"status": "not_reported", "summary": "Not yet analyzed.", "anchors": []},
+    "datasets": {"status": "not_reported", "summary": "Not yet analyzed.", "anchors": []},
+    "baselines": {"status": "not_reported", "summary": "Not yet analyzed.", "anchors": []},
+    "metrics": {"status": "not_reported", "summary": "Not yet analyzed.", "anchors": []},
+    "ablations": {"status": "not_reported", "summary": "Not yet analyzed.", "anchors": []},
+    "negative_results": {"status": "not_reported", "summary": "Not yet analyzed.", "anchors": []}
+  },
+  "evidence_synthesis": {
+    "experiments": [],
+    "strengths": {},
+    "weaknesses": {},
+    "reusability": {}
+  },
+  "claims": [],
+  "critical_assessment": {
+    "strengths": [],
+    "claim_evidence_gaps": [],
+    "comparison_to_prior_work": [],
+    "limitations": [],
+    "threats_to_validity": [],
+    "missing_evidence": [],
+    "overall_judgment": {}
+  },
+  "reproducibility": {
+    "code": "not_reported",
+    "data": "not_reported",
+    "environment": "not_reported",
+    "replication_notes": {}
+  },
+  "profile_analysis": {
+    "profile": "general",
+    "summary": {},
+    "applicability": "medium",
+    "integration_difficulty": "unknown",
+    "insights": []
+  },
+  "concepts": [],
+  "open_questions": [],
+  "references": []
+}

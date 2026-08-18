@@ -32,6 +32,8 @@ MARKDOWN_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
 LOCAL_PATTERN_DEFINITION_FILES = {
     Path("scripts/release_audit.py"),
     Path(".agents/skills/paper-deep-analysis/scripts/paperlib/common.py"),
+    # The dsh bundle ships a byte-identical copy of the canonical paperlib.
+    Path("dsh/assets/scripts/paperlib/common.py"),
 }
 
 
