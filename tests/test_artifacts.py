@@ -163,7 +163,11 @@ def test_missing_current_section_feedback_is_rejected(tmp_path: Path) -> None:
 def test_citations_are_grouped_after_reading_units() -> None:
     rendered = render_report(sample_analysis())
     statement_count = len(list(rendered.split('class="source-line"'))) - 1
-    assert statement_count < 20
+    # One source line per reading unit (narrative, method blocks, evidence table,
+    # design-adequacy table, claims, six critique blocks, judgment, profile,
+    # concepts, reproduction, open questions); the bound guards against
+    # sentence-level citation fragmentation, not against new reading units.
+    assert statement_count < 24
     assert sample_analysis()["executive_summary"]["evidence_summary"] in rendered
 
 

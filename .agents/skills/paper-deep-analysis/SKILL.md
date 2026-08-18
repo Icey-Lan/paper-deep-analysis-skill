@@ -179,6 +179,14 @@ pseudo-quantitative distribution. Instead, write one explicit
 does not. Fill `evidence_synthesis` with the paper's actual experiment scope,
 measures, findings, strengths, weaknesses, and reusable evaluation pattern.
 
+Fill `evidence_assessment` with an adequacy judgment for each of the six
+evaluation-design dimensions — study design, datasets, baselines, metrics,
+ablations, and negative results: a `status` of `adequate`, `mixed`, `weak`,
+`not_reported`, or `not_applicable`, a one-sentence `summary`, and evidence
+anchors for every judged dimension. The report renders these judgments in the
+Evidence section, the validator requires anchors for judged dimensions, and the
+dataset exporter records them as analyst inferences.
+
 Build criticism across multiple defensible dimensions: method/evidence
 strengths, claim-evidence gaps, relationship to prior work or SOTA, scope and
 method limitations, validity/generalization risks, and missing evidence. Each

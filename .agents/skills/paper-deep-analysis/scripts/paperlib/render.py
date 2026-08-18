@@ -151,6 +151,12 @@ p { margin: 0 0 1rem; }
 .evidence-table th { padding: .65rem .7rem; border-bottom: 2px solid var(--line); color: var(--muted); font-size: .7rem; letter-spacing: .06em; text-align: left; text-transform: uppercase; }
 .evidence-table td { padding: .75rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
 .evidence-table td:first-child { color: var(--ink); font-weight: 650; }
+.assessment-figure { margin: 1.8rem 0 0; }
+.assessment-figure figcaption { margin-bottom: .7rem; color: var(--muted); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
+.assessment-table { width: 100%; border-collapse: collapse; font-size: .85rem; line-height: 1.55; }
+.assessment-table th { padding: .6rem .7rem; border-bottom: 2px solid var(--line); color: var(--muted); font-size: .7rem; letter-spacing: .06em; text-align: left; text-transform: uppercase; }
+.assessment-table td { padding: .7rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.assessment-status { display: inline-block; padding: .1rem .45rem; border-radius: .25rem; background: var(--panel); color: var(--ink); font-size: .75rem; }
 .evidence-synthesis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; margin-top: 1.4rem; }
 .evidence-synthesis article { padding-top: .75rem; border-top: 3px solid var(--green); }
 .evidence-synthesis article:nth-child(2) { border-top-color: var(--rust); }
@@ -211,6 +217,10 @@ footer .top-link { display: inline-block; margin-top: .4rem; }
   .evidence-table, .evidence-table tbody, .evidence-table tr, .evidence-table td { display: block; width: 100%; }
   .evidence-table tr { padding: .7rem 0; border-bottom: 1px solid var(--line); }
   .evidence-table td { padding: .18rem 0; border: 0; }
+  .assessment-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .assessment-table, .assessment-table tbody, .assessment-table tr, .assessment-table td { display: block; width: 100%; }
+  .assessment-table tr { padding: .7rem 0; border-bottom: 1px solid var(--line); }
+  .assessment-table td { padding: .18rem 0; border: 0; }
   .profile-verdicts { gap: 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -255,6 +265,10 @@ ZH = {
     "reasoning-planning": "推理与规划", "data-agent": "Data Agent", "embodied-agent": "具身 Agent", "custom": "自定义",
     "high": "高", "medium": "中", "low": "低", "unknown": "未知", "not_applicable": "不适用",
     "available": "可用", "partial": "部分可用", "unavailable": "不可用", "not_reported": "未报告", "specified": "已说明",
+    "design_adequacy": "实验设计充分性", "aspect": "方面", "status": "状态", "summary": "概述",
+    "study_design": "研究设计", "datasets": "数据集", "baselines": "基线", "metrics": "指标",
+    "ablations": "消融", "negative_results": "负结果",
+    "adequate": "充分", "mixed": "部分充分", "weak": "薄弱",
 }
 
 EN = {
@@ -275,6 +289,10 @@ EN = {
     "concept_value": "Why it matters", "code": "Code", "data": "Data", "environment": "Environment", "references": "References",
     "sources": "Source locations", "generated": "Deterministically rendered from validated analysis.json", "back_top": "Back to top", "skip": "Skip to analysis",
     "model": "Model", "host": "Host", "license": "Paper license", "unknown_date": "date unknown", "unknown_venue": "venue unknown",
+    "design_adequacy": "Design adequacy", "aspect": "Aspect", "status": "Status", "summary": "Summary",
+    "study_design": "Study design", "datasets": "Datasets", "baselines": "Baselines", "metrics": "Metrics",
+    "ablations": "Ablations", "negative_results": "Negative results",
+    "adequate": "adequate", "mixed": "mixed", "weak": "weak",
 }
 
 
@@ -359,6 +377,31 @@ def render_evidence(synthesis: dict[str, Any], labels: dict[str, str]) -> str:
     )
 
 
+def render_assessment(assessment: dict[str, Any], labels: dict[str, str]) -> str:
+    order = ("study_design", "datasets", "baselines", "metrics", "ablations", "negative_results")
+    rows = ""
+    all_items: list[dict[str, Any]] = []
+    for key in order:
+        item = assessment.get(key)
+        if not isinstance(item, dict):
+            continue
+        all_items.append(item)
+        status = enum_text(str(item.get("status") or "not_reported"), labels)
+        rows += (
+            f'<tr><td>{esc(labels[key])}</td>'
+            f'<td><span class="assessment-status">{esc(status)}</span></td>'
+            f'<td>{esc(item.get("summary") or "")}</td></tr>'
+        )
+    if not rows:
+        return ""
+    return (
+        f'<figure class="assessment-figure"><figcaption>{labels["design_adequacy"]}</figcaption>'
+        f'<table class="assessment-table"><thead><tr><th>{labels["aspect"]}</th>'
+        f'<th>{labels["status"]}</th><th>{labels["summary"]}</th></tr></thead>'
+        f'<tbody>{rows}</tbody>{source_line(all_items, labels)}</figure>'
+    )
+
+
 def render_claims(claims: list[dict[str, Any]], labels: dict[str, str]) -> str:
     items = "".join(
         f'<li><p class="claim-text">{esc(item["text"])}</p><p class="claim-support"><b>{labels["support"]}：</b>{esc(item["support"])}</p>'
@@ -440,7 +483,7 @@ def render_report(analysis: dict[str, Any]) -> str:
     <section id="summary" class="exec-summary"><h2>{labels["summary"]}</h2><p class="core-conclusion">{esc(summary["core_conclusion"])}</p><div class="summary-grid"><div><h3>{labels["why"]}</h3><p>{esc(summary["why_it_matters"])}</p></div><div><h3>{labels["bottom"]}</h3><p>{esc(summary["analyst_verdict"])}</p></div></div><div class="focus"><h3>{labels["focus"]}</h3><ol>{focus}</ol></div></section>
     <section id="narrative"><h2>{labels["narrative"]}</h2>{render_narrative(narrative, analysis["contributions"], labels)}</section>
     <section id="method"><h2>{labels["method"]}</h2><div class="prose-block"><h3>{labels["problem"]}</h3><p>{esc(method["problem"]["text"])}</p>{source_line([method["problem"]], labels)}</div><div class="prose-block"><h3>{labels["approach"]}</h3><p>{esc(method["approach"]["text"])}</p>{source_line([method["approach"]], labels)}</div>{render_method_flow(method["workflow"], labels)}<h3>{labels["assumptions"]}</h3><ol class="assumption-list">{"".join(f'<li>{esc(item["text"])}</li>' for item in method["assumptions"])}</ol>{source_line(method["assumptions"], labels)}</section>
-    <section id="evidence"><h2>{labels["evidence"]}</h2>{render_evidence(analysis["evidence_synthesis"], labels)}</section>
+    <section id="evidence"><h2>{labels["evidence"]}</h2>{render_evidence(analysis["evidence_synthesis"], labels)}{render_assessment(analysis.get("evidence_assessment", {}), labels)}</section>
     <section id="claims"><h2>{labels["claims"]}</h2>{render_claims(analysis["claims"], labels)}</section>
     <section id="critique"><h2>{labels["critique"]}</h2><div class="critical-grid">{critical_grid}</div><article class="overall-judgment"><h3>{labels["judgment"]}</h3><p>{esc(critical["overall_judgment"]["text"])}</p>{source_line([critical["overall_judgment"]], labels)}</article></section>
     <section id="profile"><h2>{esc(enum_text(profile["profile"], labels))} · {labels["profile"]}</h2><div class="profile-summary"><div class="profile-verdicts"><span>{labels["applicability"]}<strong>{esc(enum_text(profile["applicability"], labels))}</strong></span><span>{labels["difficulty"]}<strong>{esc(enum_text(profile["integration_difficulty"], labels))}</strong></span></div><p>{esc(profile["summary"]["text"])}</p>{source_line([profile["summary"]], labels)}</div><ol class="insight-list">{insight_items}</ol>{source_line(profile["insights"], labels)}</section>

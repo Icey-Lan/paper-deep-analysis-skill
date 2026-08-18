@@ -163,6 +163,20 @@ def validate_analysis(analysis: dict[str, Any], manifest: dict[str, Any] | None 
             page = anchor.get("page")
             if page_count and page and page > page_count:
                 errors.append(f"{location}: evidence page {page} exceeds manifest page count {page_count}")
+    assessment = analysis.get("evidence_assessment", {})
+    for key in ("study_design", "datasets", "baselines", "metrics", "ablations", "negative_results"):
+        item = assessment.get(key)
+        location = f"evidence_assessment.{key}"
+        if not isinstance(item, dict):
+            errors.append(f"{location}: assessment item is missing")
+            continue
+        status = item.get("status")
+        if status in {"adequate", "mixed", "weak"} and not item.get("anchors"):
+            errors.append(f"{location}: judgment status {status} has no evidence anchor")
+        for anchor in item.get("anchors", []):
+            page = anchor.get("page")
+            if page_count and page and page > page_count:
+                errors.append(f"{location}: evidence page {page} exceeds manifest page count {page_count}")
     for location, item, anchor_required in _iter_statements(analysis):
         item_id = item.get("id")
         if item_id in seen:

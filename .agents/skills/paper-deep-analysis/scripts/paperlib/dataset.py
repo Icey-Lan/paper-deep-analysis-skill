@@ -22,6 +22,29 @@ def _statements(analysis: dict[str, Any]) -> Iterable[tuple[str, dict[str, Any]]
     synthesis = analysis["evidence_synthesis"]
     for key in ("strengths", "weaknesses", "reusability"):
         yield "finding", synthesis[key]
+    assessment = analysis.get("evidence_assessment", {})
+    for key in ("study_design", "datasets", "baselines", "metrics", "ablations", "negative_results"):
+        item = assessment.get(key)
+        if not isinstance(item, dict):
+            continue
+        record = dict(item)
+        record.pop("status", None)
+        record.pop("summary", None)
+        record["id"] = f"assessment-{key.replace('_', '-')}"
+        record["text"] = item.get("summary", "")
+        # Adequacy judgments are the analyst's, not the authors'; the strength
+        # mapping follows the status label the analyst chose.
+        record["attribution"] = "analyst_inference"
+        record["confidence"] = "medium"
+        record["evidence_strength"] = {
+            "adequate": "strong",
+            "mixed": "moderate",
+            "weak": "weak",
+            "not_reported": "not_reported",
+            "not_applicable": "not_reported",
+        }.get(item.get("status"), "not_reported")
+        record["tags"] = ["assessment", key.replace("_", "-")]
+        yield "assessment", record
     for item in analysis["claims"]:
         yield "claim", item
     critical = analysis["critical_assessment"]
