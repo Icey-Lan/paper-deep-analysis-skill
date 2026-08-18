@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+- Fixed `evidence_assessment` being required but never surfaced: the report now
+  renders the six evaluation-design adequacy judgments in the Evidence section,
+  the validator requires evidence anchors for judged dimensions, and the dataset
+  exporter records them as analyst inferences (`record_type: assessment`).
+- Added a DeepSeek Harness (dsh) plugin bundle under `dsh/`: a Cordis bundle
+  (`dsh-plugin-paper-deep-analysis`) that registers `paper-deep-analysis` as an
+  installable skill, with a self-bootstrapping Python runtime (PEP 668 safe), a
+  sync/drift gate (`dsh/sync-assets.py --check`), and CI coverage for the
+  bundle, runtime, and publish contents.
+- Added a DSH-only `render_page.py` helper that renders source-PDF pages to PNG
+  so image-capable host models can inspect figures via `read_image`, with
+  explicit honest-disclosure guidance for models without image input.
+
 ## 0.1.1 - 2026-08-14
 
 - Made the paper-source link explicit in generated reports.
